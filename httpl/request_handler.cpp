@@ -13,8 +13,8 @@
 #include <sstream>
 #include <string>
 #include "mime_types.hpp"
-#include "../asios/reply.hpp"
-#include "../asios/request.hpp"
+#include "reply.hpp"
+#include "request.hpp"
 
 namespace ses {
 

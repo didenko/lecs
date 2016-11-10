@@ -12,10 +12,10 @@
 
 #include <asio.hpp>
 
-namespace ses {
+namespace asios {
 
 using connection_new = std::function<void(const asio::ip::tcp::socket &)>;
-using request_handler = std::function<void(const request &, reply &)>;
+using request_handler = std::function<void(const ses::request &, ses::reply &)>;
 
 class Context
 {

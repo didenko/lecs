@@ -10,7 +10,7 @@
 
 #include "connection_manager.hpp"
 
-namespace ses {
+namespace asios {
 
 connection_manager::connection_manager()
 {

@@ -13,7 +13,7 @@ set(SOURCE_FILES
     asios/connection.cpp
     asios/connection_manager.cpp
     httpl/mime_types.cpp
-    asios/reply.cpp
+    httpl/reply.cpp
     httpl/request_handler.cpp
     httpl/request_parser.cpp
     asios/server.cpp

@@ -19,7 +19,7 @@
 
 #include "context.hpp"
 
-namespace ses {
+namespace asios {
 
 /// The top-level class of the HTTP server.
 class server

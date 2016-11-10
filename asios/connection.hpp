@@ -14,13 +14,13 @@
 #include <array>
 #include <memory>
 #include <asio.hpp>
-#include "reply.hpp"
-#include "request.hpp"
+#include "../httpl/reply.hpp"
+#include "../httpl/request.hpp"
 //#include "request_handler.hpp"
 #include "../httpl/request_parser.hpp"
 #include "context.hpp"
 
-namespace ses {
+namespace asios {
 
 class connection_manager;
 
@@ -66,13 +66,13 @@ private:
   std::array<char, 8192> buffer_;
 
   /// The incoming request.
-  request request_;
+  ses::request request_;
 
   /// The parser for the incoming request.
-  request_parser request_parser_;
+  ses::request_parser request_parser_;
 
   /// The reply to be sent back to the client.
-  reply reply_;
+  ses::reply reply_;
 };
 
 typedef std::shared_ptr<connection> connection_ptr;

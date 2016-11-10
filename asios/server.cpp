@@ -12,7 +12,7 @@
 #include <signal.h>
 #include <utility>
 
-namespace ses {
+namespace asios {
 
 server::server(
   const std::string &address,
@@ -24,7 +24,7 @@ server::server(
   acceptor_(io_service_),
   connection_manager_(),
   socket_(io_service_),
-  context (context)
+  context(context)
 {
   // Register to handle the signals that indicate when the server should exit.
   // It is safe to register for the same signal multiple times in a program,
@@ -59,28 +59,29 @@ void server::run()
 
 void server::do_accept()
 {
-  acceptor_.async_accept(socket_,
-                         [this](std::error_code ec) {
-                           // Check whether the server was stopped by a signal before this
-                           // completion handler had a chance to run.
-                           if (!acceptor_.is_open())
-                           {
-                             return;
-                           }
+  acceptor_.async_accept(
+    socket_,
+    [this](std::error_code ec) {
+      // Check whether the server was stopped by a signal before this
+      // completion handler had a chance to run.
+      if (!acceptor_.is_open())
+      {
+        return;
+      }
 
-                           if (!ec)
-                           {
-                             connection_manager_.start(
-                               std::make_shared<connection>(
-                                 std::move(socket_),
-                                 connection_manager_,
-                                 context
-                               )
-                             );
-                           }
+      if (!ec)
+      {
+        connection_manager_.start(
+          std::make_shared<connection>(
+            std::move(socket_),
+            connection_manager_,
+            context
+          )
+        );
+      }
 
-                           do_accept();
-                         });
+      do_accept();
+    });
 }
 
 void server::do_await_stop()

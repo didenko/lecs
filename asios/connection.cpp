@@ -16,7 +16,7 @@
 
 #include <iostream>
 
-namespace ses {
+namespace asios {
 
 connection::connection(
   asio::ip::tcp::socket socket,
@@ -29,6 +29,8 @@ connection::connection(
 {
   context->on_new_conn(socket_);
 }
+
+using parse_response = enum { good, bad, incomplete };
 
 void connection::start()
 {
@@ -48,18 +50,18 @@ void connection::do_read()
     [this, self](std::error_code ec, std::size_t bytes_transferred) {
       if (!ec)
       {
-        request_parser::result_type result;
+        ses::request_parser::result_type result;
         std::tie(result, std::ignore) = request_parser_.parse(
           request_, buffer_.data(), buffer_.data() + bytes_transferred);
 
-        if (result == request_parser::good)
+        if (result == ses::request_parser::good)
         {
           context->on_request(request_, reply_);
           do_write();
         }
-        else if (result == request_parser::bad)
+        else if (result == ses::request_parser::bad)
         {
-          reply_ = reply::stock_reply(reply::bad_request);
+          reply_ = ses::reply::stock_reply(ses::reply::bad_request);
           do_write();
         }
         else
