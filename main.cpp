@@ -9,12 +9,9 @@
 //
 
 #include <iostream>
-#include <string>
 
 #include <asio.hpp>
 #include "asios/server.hpp"
-
-#include "asios/context.hpp"
 
 asios::connection_new on_new_conn = [](const asio::ip::tcp::socket &s) {
   asio::error_code ec;
@@ -52,6 +49,22 @@ asios::request_handler handle_request = [](const ses::request &req, ses::reply &
     << "\"" << std::endl;
 };
 
+asios::request_collect collector = [](asio::mutable_buffer b, std::size_t s) -> asios::collect_response {
+  return asios::collect_response::good;
+};
+
+//class http_context: public ses::Context
+//{
+//  http_context(
+//    ses::connection_new c,
+//    ses::request_handler r
+//  ) : ses::Context(c, r)
+//  {};
+//
+//private:
+//  ses::request req;
+//};
+
 int main(int argc, char *argv[])
 {
   try
@@ -69,6 +82,7 @@ int main(int argc, char *argv[])
 
     auto context = std::make_shared<asios::Context>(
       on_new_conn,
+      collector,
       handle_request
     );
     // Initialise the server.

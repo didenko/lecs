@@ -9,10 +9,7 @@
 //
 
 #include "connection.hpp"
-#include <utility>
-#include <vector>
 #include "connection_manager.hpp"
-//#include "request_handler.hpp"
 
 #include <iostream>
 
@@ -29,8 +26,6 @@ connection::connection(
 {
   context->on_new_conn(socket_);
 }
-
-using parse_response = enum { good, bad, incomplete };
 
 void connection::start()
 {
@@ -50,16 +45,21 @@ void connection::do_read()
     [this, self](std::error_code ec, std::size_t bytes_transferred) {
       if (!ec)
       {
-        ses::request_parser::result_type result;
-        std::tie(result, std::ignore) = request_parser_.parse(
-          request_, buffer_.data(), buffer_.data() + bytes_transferred);
+//        collect_response result;
+//        std::tie(result, std::ignore) = request_parser_.parse(
+//          request_,
+//          buffer_.data(),
+//          buffer_.data() + bytes_transferred
+//        );
 
-        if (result == ses::request_parser::good)
+        auto result = context->do_collect(asio::buffer(buffer_), bytes_transferred);
+
+        if (result == collect_response::good)
         {
           context->on_request(request_, reply_);
           do_write();
         }
-        else if (result == ses::request_parser::bad)
+        else if (result == collect_response::bad)
         {
           reply_ = ses::reply::stock_reply(ses::reply::bad_request);
           do_write();
