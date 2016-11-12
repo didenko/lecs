@@ -62,7 +62,7 @@ private:
   asio::ip::tcp::socket socket_;
 
   /// The handler for all incoming requests.
-  request_handler request_handler_;
+//  request_handler request_handler_;
   context_ptr context;
 };
 

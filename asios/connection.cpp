@@ -24,7 +24,7 @@ connection::connection(
   connection_manager_(manager),
   context(context)
 {
-  context->on_new_conn(socket_);
+  context->on_new_conn(shared_from_this(), socket_);
 }
 
 void connection::start()
@@ -52,22 +52,23 @@ void connection::do_read()
 //          buffer_.data() + bytes_transferred
 //        );
 
-        auto result = context->do_collect(asio::buffer(buffer_), bytes_transferred);
+        context->on_read(self, asio::buffer(buffer_), bytes_transferred);
+        do_read();
 
-        if (result == collect_response::good)
-        {
-          context->on_request(request_, reply_);
-          do_write();
-        }
-        else if (result == collect_response::bad)
-        {
-          reply_ = ses::reply::stock_reply(ses::reply::bad_request);
-          do_write();
-        }
-        else
-        {
-          do_read();
-        }
+//        if (result == decltype(result)::good)
+//        {
+//          context->on_request(request_, reply_);
+//          do_write();
+//        }
+//        else if (result == decltype(result)::bad)
+//        {
+//          reply_ = ses::reply::stock_reply(ses::reply::bad_request);
+//          do_write();
+//        }
+//        else
+//        {
+//          do_read();
+//        }
       }
       else if (ec != asio::error::operation_aborted)
       {

@@ -18,4 +18,7 @@ set(SOURCE_FILES
     httpl/request_parser.cpp
     asios/server.cpp
 )
+
 add_executable(svr ${SOURCE_FILES})
+
+add_dependencies(svr asio)

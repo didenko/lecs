@@ -13,7 +13,10 @@
 #include <asio.hpp>
 #include "asios/server.hpp"
 
-asios::connection_new on_new_conn = [](const asio::ip::tcp::socket &s) {
+asios::connection_new on_new_conn = [](
+  const asios::connection_ptr,
+  const asio::ip::tcp::socket &s
+) {
   asio::error_code ec;
   auto remote_ep = s.remote_endpoint(ec);
   if (ec)
@@ -33,24 +36,27 @@ asios::connection_new on_new_conn = [](const asio::ip::tcp::socket &s) {
     << std::endl;
 };
 
-asios::request_handler handle_request = [](const ses::request &req, ses::reply &rep) {
-  rep.status = ses::reply::ok;
-  std::string buf{"Hello world!"};
-  rep.content.append(buf.c_str(), buf.size());
-  rep.headers.resize(2);
-  rep.headers[0].name = "Content-Length";
-  rep.headers[0].value = std::to_string(rep.content.size());
-  rep.headers[1].name = "Content-Type";
-  rep.headers[1].value = "text/plain";
+//asios::request_handler handle_request = [](const ses::request &req, ses::reply &rep) {
+//  rep.status = ses::reply::ok;
+//  std::string buf{"Hello world!"};
+//  rep.content.append(buf.c_str(), buf.size());
+//  rep.headers.resize(2);
+//  rep.headers[0].name = "Content-Length";
+//  rep.headers[0].value = std::to_string(rep.content.size());
+//  rep.headers[1].name = "Content-Type";
+//  rep.headers[1].value = "text/plain";
+//
+//  std::cerr
+//    << "Request: \""
+//    << req.uri
+//    << "\"" << std::endl;
+//};
 
-  std::cerr
-    << "Request: \""
-    << req.uri
-    << "\"" << std::endl;
-};
-
-asios::request_collect collector = [](asio::mutable_buffer b, std::size_t s) -> asios::collect_response {
-  return asios::collect_response::good;
+asios::read_handler on_read = [](
+  const asios::connection_ptr,
+  asio::mutable_buffer b, std::size_t s
+) {
+  std::cerr << "Got data." << std::endl;
 };
 
 //class http_context: public ses::Context
@@ -82,8 +88,7 @@ int main(int argc, char *argv[])
 
     auto context = std::make_shared<asios::Context>(
       on_new_conn,
-      collector,
-      handle_request
+      on_read
     );
     // Initialise the server.
     asios::server s(argv[1], argv[2], context);

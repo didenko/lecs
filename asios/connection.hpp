@@ -66,16 +66,14 @@ private:
   std::array<char, 8192> buffer_;
 
   /// The incoming request.
-  ses::request request_;
+//  ses::request request_;
 
   /// The parser for the incoming request.
-  ses::request_parser request_parser_;
+//  ses::request_parser request_parser_;
 
   /// The reply to be sent back to the client.
   ses::reply reply_;
 };
-
-typedef std::shared_ptr<connection> connection_ptr;
 
 }
 
