@@ -62,7 +62,7 @@ void connection::do_read()
 //        }
 //        else if (result == decltype(result)::bad)
 //        {
-//          reply_ = ses::reply::stock_reply(ses::reply::bad_request);
+//          reply_ = httpl::reply::stock_reply(httpl::reply::bad_request);
 //          do_write();
 //        }
 //        else

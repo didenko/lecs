@@ -8,12 +8,11 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef HTTP_REQUEST_PARSER_HPP
-#define HTTP_REQUEST_PARSER_HPP
+#pragma once
 
 #include <tuple>
 
-namespace ses {
+namespace httpl {
 
 struct request;
 
@@ -90,5 +89,3 @@ private:
 };
 
 }
-
-#endif // HTTP_REQUEST_PARSER_HPP

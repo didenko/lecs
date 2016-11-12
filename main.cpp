@@ -36,8 +36,8 @@ asios::connection_new on_new_conn = [](
     << std::endl;
 };
 
-//asios::request_handler handle_request = [](const ses::request &req, ses::reply &rep) {
-//  rep.status = ses::reply::ok;
+//asios::request_handler handle_request = [](const httpl::request &req, httpl::reply &rep) {
+//  rep.status = httpl::reply::ok;
 //  std::string buf{"Hello world!"};
 //  rep.content.append(buf.c_str(), buf.size());
 //  rep.headers.resize(2);
@@ -59,16 +59,16 @@ asios::read_handler on_read = [](
   std::cerr << "Got data." << std::endl;
 };
 
-//class http_context: public ses::Context
+//class http_context: public httpl::Context
 //{
 //  http_context(
-//    ses::connection_new c,
-//    ses::request_handler r
-//  ) : ses::Context(c, r)
+//    httpl::connection_new c,
+//    httpl::request_handler r
+//  ) : httpl::Context(c, r)
 //  {};
 //
 //private:
-//  ses::request req;
+//  httpl::request req;
 //};
 
 int main(int argc, char *argv[])

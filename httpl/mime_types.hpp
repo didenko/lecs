@@ -8,12 +8,11 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef HTTP_MIME_TYPES_HPP
-#define HTTP_MIME_TYPES_HPP
+#pragma once
 
 #include <string>
 
-namespace ses {
+namespace httpl {
 namespace mime_types {
 
 /// Convert a file extension into a MIME type.
@@ -21,5 +20,3 @@ std::string extension_to_type(const std::string& extension);
 
 } // namespace mime_types
 }
-
-#endif // HTTP_MIME_TYPES_HPP

@@ -8,8 +8,7 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef HTTP_CONNECTION_MANAGER_HPP
-#define HTTP_CONNECTION_MANAGER_HPP
+#pragma once
 
 #include <set>
 #include "connection.hpp"
@@ -42,5 +41,3 @@ private:
 };
 
 }
-
-#endif // HTTP_CONNECTION_MANAGER_HPP

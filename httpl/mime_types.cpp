@@ -10,7 +10,7 @@
 
 #include "mime_types.hpp"
 
-namespace ses {
+namespace httpl {
 namespace mime_types {
 
 struct mapping

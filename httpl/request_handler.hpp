@@ -8,12 +8,11 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef HTTP_REQUEST_HANDLER_HPP
-#define HTTP_REQUEST_HANDLER_HPP
+#pragma once
 
 #include <string>
 
-namespace ses {
+namespace httpl {
 
 struct reply;
 struct request;
@@ -41,5 +40,3 @@ private:
 };
 
 }
-
-#endif // HTTP_REQUEST_HANDLER_HPP

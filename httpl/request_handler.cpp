@@ -16,7 +16,7 @@
 #include "reply.hpp"
 #include "request.hpp"
 
-namespace ses {
+namespace httpl {
 
 request_handler::request_handler(const std::string& doc_root)
   : doc_root_(doc_root)

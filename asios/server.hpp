@@ -8,8 +8,7 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef HTTP_SERVER_HPP
-#define HTTP_SERVER_HPP
+#pragma once
 
 #include <asio.hpp>
 #include <string>
@@ -67,5 +66,3 @@ private:
 };
 
 }
-
-#endif // HTTP_SERVER_HPP

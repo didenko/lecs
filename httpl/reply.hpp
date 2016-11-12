@@ -8,15 +8,14 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef HTTP_REPLY_HPP
-#define HTTP_REPLY_HPP
+#pragma once
 
 #include <string>
 #include <vector>
 #include <asio.hpp>
 #include "header.hpp"
 
-namespace ses {
+namespace httpl {
 
 /// A reply to be sent to a client.
 struct reply
@@ -58,5 +57,3 @@ struct reply
 };
 
 }
-
-#endif // HTTP_REPLY_HPP

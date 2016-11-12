@@ -11,7 +11,7 @@
 #include "request_parser.hpp"
 #include "request.hpp"
 
-namespace ses {
+namespace httpl {
 
 request_parser::request_parser()
   : state_(method_start)

@@ -8,16 +8,15 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef HTTP_CONNECTION_HPP
-#define HTTP_CONNECTION_HPP
+#pragma once
 
 #include <array>
 #include <memory>
 #include <asio.hpp>
 #include "../httpl/reply.hpp"
-#include "../httpl/request.hpp"
-//#include "request_handler.hpp"
-#include "../httpl/request_parser.hpp"
+//#include "../httpl/request.hpp"
+////#include "request_handler.hpp"
+//#include "../httpl/request_parser.hpp"
 #include "context.hpp"
 
 namespace asios {
@@ -66,15 +65,13 @@ private:
   std::array<char, 8192> buffer_;
 
   /// The incoming request.
-//  ses::request request_;
+//  httpl::request request_;
 
   /// The parser for the incoming request.
-//  ses::request_parser request_parser_;
+//  httpl::request_parser request_parser_;
 
   /// The reply to be sent back to the client.
-  ses::reply reply_;
+  httpl::reply reply_;
 };
 
 }
-
-#endif // HTTP_CONNECTION_HPP

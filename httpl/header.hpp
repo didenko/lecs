@@ -8,12 +8,11 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef HTTP_HEADER_HPP
-#define HTTP_HEADER_HPP
+#pragma once
 
 #include <string>
 
-namespace ses {
+namespace httpl {
 
 struct header
 {
@@ -22,5 +21,3 @@ struct header
 };
 
 }
-
-#endif // HTTP_HEADER_HPP

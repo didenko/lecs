@@ -11,7 +11,7 @@
 #include "reply.hpp"
 #include <string>
 
-namespace ses {
+namespace httpl {
 
 namespace status_strings {
 
