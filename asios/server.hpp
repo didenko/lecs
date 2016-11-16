@@ -3,6 +3,7 @@
 // ~~~~~~~~~~
 //
 // Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2016 Vlad Didenko (business at didenko dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,8 +14,6 @@
 #include <asio.hpp>
 #include <string>
 #include "connection.hpp"
-#include "connection_manager.hpp"
-//#include "request_handler.hpp"
 
 #include "context.hpp"
 
@@ -53,9 +52,6 @@ private:
 
   /// Acceptor used to listen for incoming connections.
   asio::ip::tcp::acceptor acceptor_;
-
-  /// The connection manager which owns all live connections.
-  connection_manager connection_manager_;
 
   /// The next socket to be accepted.
   asio::ip::tcp::socket socket_;

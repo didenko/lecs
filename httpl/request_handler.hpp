@@ -21,8 +21,9 @@ struct request;
 class request_handler
 {
 public:
-//  request_handler(const request_handler&) = delete;
-//  request_handler& operator=(const request_handler&) = delete;
+  request_handler(const request_handler &) = delete;
+
+  request_handler &operator=(const request_handler &) = delete;
 
   /// Construct with a directory containing files to be served.
   explicit request_handler(const std::string& doc_root);

@@ -10,14 +10,17 @@ AddAsio("${CMAKE_SOURCE_DIR}/dep/asio-1-10-8.tgz" 5cdb77d9b66242c04991ad6e9cdfbc
 
 set(SOURCE_FILES
     main.cpp
+
     asios/connection.cpp
-    asios/connection_manager.cpp
+    asios/context.cpp
+    asios/server.cpp
+
     httpl/mime_types.cpp
     httpl/reply.cpp
     httpl/request_handler.cpp
     httpl/request_parser.cpp
-    asios/server.cpp
-)
+    httpl/connection_manager.cpp
+    httpl/http_context.cpp httpl/http_context.hpp)
 
 add_executable(svr ${SOURCE_FILES})
 

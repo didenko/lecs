@@ -14,26 +14,39 @@
 
 namespace asios {
 
+using buffer = std::array<char, 8192>;
+
+enum class next
+{
+  read, write, diconnect
+};
+
 class connection;
 
-typedef std::shared_ptr<connection> connection_ptr;
+using connection_ptr = std::shared_ptr<connection>;
 
-using connection_new = std::function<void(connection_ptr, const asio::ip::tcp::socket &)>;
-using read_handler = std::function<void(connection_ptr, asio::mutable_buffers_1, std::size_t)>;
+using connected = std::function<void(connection_ptr)>;
+using disconnected = std::function<void(connection_ptr)>;
+using shutdown = std::function<void(void)>;
+using reader = std::function<next(connection_ptr, const buffer &, std::size_t)>;
+using writer = std::function<std::vector<asio::const_buffer>(connection_ptr)>;
 
 struct Context
 {
 public:
   Context(
-    connection_new c,
-    read_handler rh
-  ) :
-    on_new_conn(c),
-    on_read(rh)
-  {};
+    connected c,
+    disconnected d,
+    shutdown s,
+    reader r,
+    writer w
+  );
 
-  const connection_new on_new_conn;
-  const read_handler on_read;
+  const connected on_connect;
+  const disconnected on_disconnect;
+  const shutdown on_shutdown;
+  const reader on_read;
+  const writer on_write;
 };
 
 using context_ptr = std::shared_ptr<Context>;

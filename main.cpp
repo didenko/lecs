@@ -12,71 +12,14 @@
 
 #include <asio.hpp>
 #include "asios/server.hpp"
-
-asios::connection_new on_new_conn = [](
-  const asios::connection_ptr,
-  const asio::ip::tcp::socket &s
-) {
-  asio::error_code ec;
-  auto remote_ep = s.remote_endpoint(ec);
-  if (ec)
-  {
-    std::cerr
-      << "Accepted: "
-      << "Remote unknown: "
-      << ec.message()
-      << std::endl;
-    return;
-  }
-  std::cerr
-    << "Accepted: "
-    << "Remote: "
-    << remote_ep.address() << ":"
-    << remote_ep.port()
-    << std::endl;
-};
-
-//asios::request_handler handle_request = [](const httpl::request &req, httpl::reply &rep) {
-//  rep.status = httpl::reply::ok;
-//  std::string buf{"Hello world!"};
-//  rep.content.append(buf.c_str(), buf.size());
-//  rep.headers.resize(2);
-//  rep.headers[0].name = "Content-Length";
-//  rep.headers[0].value = std::to_string(rep.content.size());
-//  rep.headers[1].name = "Content-Type";
-//  rep.headers[1].value = "text/plain";
-//
-//  std::cerr
-//    << "Request: \""
-//    << req.uri
-//    << "\"" << std::endl;
-//};
-
-asios::read_handler on_read = [](
-  const asios::connection_ptr,
-  asio::mutable_buffer b, std::size_t s
-) {
-  std::cerr << "Got data." << std::endl;
-};
-
-//class http_context: public httpl::Context
-//{
-//  http_context(
-//    httpl::connection_new c,
-//    httpl::request_handler r
-//  ) : httpl::Context(c, r)
-//  {};
-//
-//private:
-//  httpl::request req;
-//};
+#include "httpl/http_context.hpp"
 
 int main(int argc, char *argv[])
 {
   try
   {
     // Check command line arguments.
-    if (argc < 3)
+    if (argc < 4)
     {
       std::cerr << "Usage: http_server <address> <port> <doc_root>\n";
       std::cerr << "  For IPv4, try:\n";
@@ -86,9 +29,15 @@ int main(int argc, char *argv[])
       return 1;
     }
 
+    httpl::http_context handlers{argv[3]};
+
+    using namespace std::placeholders;
     auto context = std::make_shared<asios::Context>(
-      on_new_conn,
-      on_read
+      std::bind(&httpl::http_context::on_connect, &handlers, _1),
+      std::bind(&httpl::http_context::on_disconnect, &handlers, _1),
+      std::bind(&httpl::http_context::shutdown, &handlers),
+      std::bind(&httpl::http_context::on_read, &handlers, _1, _2, _3),
+      std::bind(&httpl::http_context::on_write, &handlers, _1)
     );
     // Initialise the server.
     asios::server s(argv[1], argv[2], context);

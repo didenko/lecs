@@ -3,29 +3,26 @@
 // ~~~~~~~~~~~~~~
 //
 // Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2016 Vlad Didenko (business at didenko dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include "connection.hpp"
-#include "connection_manager.hpp"
-
 #include <iostream>
+#include <signal.h>
+
+#include "connection.hpp"
 
 namespace asios {
 
 connection::connection(
   asio::ip::tcp::socket socket,
-  connection_manager &manager,
   context_ptr context
 )
   : socket_(std::move(socket)),
-  connection_manager_(manager),
   context(context)
-{
-  context->on_new_conn(shared_from_this(), socket_);
-}
+{}
 
 void connection::start()
 {
@@ -37,6 +34,28 @@ void connection::stop()
   socket_.close();
 }
 
+std::tuple<asio::ip::tcp::endpoint, asio::error_code> connection::endpoint_local() const
+{
+  asio::error_code ec;
+  auto ep = socket_.local_endpoint(ec);
+  return std::make_tuple(
+    std::move(ep),
+    std::move(ec)
+  );
+};
+
+std::tuple<asio::ip::tcp::endpoint, asio::error_code> connection::endpoint_remote() const
+{
+  asio::error_code ec;
+  auto ep = socket_.remote_endpoint(ec);
+  return std::make_tuple(
+    std::move(ep),
+    std::move(ec)
+  );
+};
+
+std::tuple<asio::ip::tcp::endpoint, asio::error_code> connection::endpoint_remote() const;
+
 void connection::do_read()
 {
   auto self(shared_from_this());
@@ -45,34 +64,23 @@ void connection::do_read()
     [this, self](std::error_code ec, std::size_t bytes_transferred) {
       if (!ec)
       {
-//        collect_response result;
-//        std::tie(result, std::ignore) = request_parser_.parse(
-//          request_,
-//          buffer_.data(),
-//          buffer_.data() + bytes_transferred
-//        );
-
-        context->on_read(self, asio::buffer(buffer_), bytes_transferred);
-        do_read();
-
-//        if (result == decltype(result)::good)
-//        {
-//          context->on_request(request_, reply_);
-//          do_write();
-//        }
-//        else if (result == decltype(result)::bad)
-//        {
-//          reply_ = httpl::reply::stock_reply(httpl::reply::bad_request);
-//          do_write();
-//        }
-//        else
-//        {
-//          do_read();
-//        }
+        switch (context->on_read(self, buffer_, bytes_transferred))
+        {
+          case next::read:
+            do_read();
+            break;
+          case next::write:
+            do_write();
+            break;
+          case next::diconnect:
+            context->on_disconnect(self);
+            raise(SIGTERM);
+            break;
+        };
       }
       else if (ec != asio::error::operation_aborted)
       {
-        connection_manager_.stop(shared_from_this());
+        context->on_disconnect(self);
       }
     });
 }
@@ -81,19 +89,22 @@ void connection::do_write()
 {
   auto self(shared_from_this());
   asio::async_write(
-    socket_, reply_.to_buffers(),
+    socket_,
+    context->on_write(self),
     [this, self](std::error_code ec, std::size_t) {
       if (!ec)
       {
         // Initiate graceful connection closure.
         asio::error_code ignored_ec;
-        socket_.shutdown(asio::ip::tcp::socket::shutdown_both,
-                         ignored_ec);
+        socket_.shutdown(
+          asio::ip::tcp::socket::shutdown_both,
+          ignored_ec
+        );
       }
 
       if (ec != asio::error::operation_aborted)
       {
-        connection_manager_.stop(shared_from_this());
+        context->on_disconnect(shared_from_this());
       }
     });
 }

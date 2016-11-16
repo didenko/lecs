@@ -3,14 +3,17 @@
 // ~~~~~~~~~~
 //
 // Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2016 Vlad Didenko (business at didenko dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include "server.hpp"
 #include <signal.h>
 #include <utility>
+#include <iostream>
+
+#include "server.hpp"
 
 namespace asios {
 
@@ -22,7 +25,6 @@ server::server(
   io_service_(),
   signals_(io_service_),
   acceptor_(io_service_),
-  connection_manager_(),
   socket_(io_service_),
   context(context)
 {
@@ -31,15 +33,24 @@ server::server(
   // provided all registration for the specified signal is made through Asio.
   signals_.add(SIGINT);
   signals_.add(SIGTERM);
-#if defined(SIGQUIT)
+
+  #if defined(SIGQUIT)
   signals_.add(SIGQUIT);
-#endif // defined(SIGQUIT)
+  #endif // defined(SIGQUIT)
 
   do_await_stop();
 
   // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
-  asio::ip::tcp::resolver resolver(io_service_);
-  asio::ip::tcp::endpoint endpoint = *resolver.resolve({address, port});
+  asio::ip::tcp::resolver resolver{io_service_};
+  asio::error_code ec;
+  auto ep_iter = resolver.resolve({address, port}, ec);
+  if (ec)
+  {
+    std::cerr << "Failed to resolve the listen address: " << ec.message() << std::endl;
+    raise(SIGTERM);
+  };
+
+  asio::ip::tcp::endpoint endpoint{*ep_iter};
   acceptor_.open(endpoint.protocol());
   acceptor_.set_option(asio::ip::tcp::acceptor::reuse_address(true));
   acceptor_.bind(endpoint);
@@ -53,7 +64,7 @@ void server::run()
   // The io_service::run() call will block until all asynchronous operations
   // have finished. While the server is running, there is always at least one
   // asynchronous operation outstanding: the asynchronous accept call waiting
-  // for new incoming connections.
+  // for new incoming clients.
   io_service_.run();
 }
 
@@ -64,17 +75,13 @@ void server::do_accept()
     [this](std::error_code ec) {
       // Check whether the server was stopped by a signal before this
       // completion handler had a chance to run.
-      if (!acceptor_.is_open())
-      {
-        return;
-      }
+      if (!acceptor_.is_open()) return;
 
       if (!ec)
       {
-        connection_manager_.start(
+        context->on_connect(
           std::make_shared<connection>(
             std::move(socket_),
-            connection_manager_,
             context
           )
         );
@@ -92,7 +99,7 @@ void server::do_await_stop()
       // operations. Once all operations have finished the io_service::run()
       // call will exit.
       acceptor_.close();
-      connection_manager_.stop_all();
+      context->on_shutdown();
     });
 }
 
