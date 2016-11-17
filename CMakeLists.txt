@@ -1,27 +1,15 @@
 cmake_minimum_required(VERSION 3.6)
 project(svr)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -DASIO_STANDALONE -pthread")
-
 include(ExternalProject)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -DASIO_STANDALONE -pthread")
 
 include(dep/asio.cmake)
 AddAsio("${CMAKE_SOURCE_DIR}/dep/asio-1-10-8.tgz" 5cdb77d9b66242c04991ad6e9cdfbc1d)
 
-set(SOURCE_FILES
-    main.cpp
+add_subdirectory(asios)
+add_subdirectory(httpl)
 
-    asios/connection.cpp
-    asios/context.cpp
-    asios/server.cpp
-
-    httpl/mime_types.cpp
-    httpl/reply.cpp
-    httpl/request_handler.cpp
-    httpl/request_parser.cpp
-    httpl/connection_manager.cpp
-    httpl/http_context.cpp httpl/http_context.hpp)
-
-add_executable(svr ${SOURCE_FILES})
-
-add_dependencies(svr asio)
+add_executable(http_example http_example.cpp)
+target_link_libraries(http_example asios httpl)
