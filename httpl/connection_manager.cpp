@@ -23,18 +23,25 @@ connection_manager::~connection_manager()
 
 void connection_manager::add(asios::connection_ptr c)
 {
-  clients[c] = std::make_shared<client>();
+  {
+    std::lock_guard<std::shared_timed_mutex> lock(clients_lock);
+    clients[c] = std::make_shared<client>();
+  }
   c->start();
 }
 
 void connection_manager::del(asios::connection_ptr c)
 {
-  clients.erase(c);
+  {
+    std::lock_guard<std::shared_timed_mutex> lock(clients_lock);
+    clients.erase(c);
+  }
   c->stop();
 }
 
 const client::ptr connection_manager::at(asios::connection_ptr conn)
 {
+  std::shared_lock<std::shared_timed_mutex> lock(clients_lock);
   return clients.at(conn);
 }
 
@@ -42,6 +49,8 @@ void connection_manager::shutdown()
 {
   for (auto client_pair: clients)
     client_pair.first->stop();
+
+  std::lock_guard<std::shared_timed_mutex> lock(clients_lock);
   clients.clear();
 }
 

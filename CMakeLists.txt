@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6)
 project(svr)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DASIO_STANDALONE -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -DASIO_STANDALONE -pthread")
 
 include(ExternalProject)
 

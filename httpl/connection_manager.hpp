@@ -12,6 +12,7 @@
 #pragma once
 
 #include <map>
+#include <shared_mutex>
 #include "../asios/connection.hpp"
 #include "client.hpp"
 
@@ -39,6 +40,7 @@ public:
 
 private:
   std::map<asios::connection_ptr, client::ptr> clients;
+  std::shared_timed_mutex clients_lock;
 };
 
 }
