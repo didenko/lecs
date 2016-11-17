@@ -37,6 +37,7 @@ public:
   std::tuple<result_type, InputIterator> parse(request& req,
       InputIterator begin, InputIterator end)
   {
+    reset();
     while (begin != end)
     {
       result_type result = consume(req, *begin++);
