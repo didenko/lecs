@@ -26,6 +26,15 @@ class connection
 {
 public:
 
+  struct endpoint_address
+  {
+    asio::ip::address addr{};
+    unsigned short port{};
+    asio::error_code err{asio::error::invalid_argument};
+
+    operator std::string() const;
+  };
+
   /// Construct a connection with the given socket.
   explicit connection(
     asio::ip::tcp::socket socket,
@@ -42,9 +51,9 @@ public:
   /// Stop all asynchronous operations associated with the connection.
   void stop();
 
-  std::tuple<asio::ip::tcp::endpoint, asio::error_code> endpoint_local() const;
+  const endpoint_address &endpoint_local();
 
-  std::tuple<asio::ip::tcp::endpoint, asio::error_code> endpoint_remote() const;
+  const endpoint_address &endpoint_remote();
 
   /// Perform an asynchronous write operation.
   void do_write();
@@ -55,6 +64,9 @@ private:
 
   /// Socket for the connection.
   asio::ip::tcp::socket socket_;
+
+  /// Cached connection addresses
+  endpoint_address local, remote;
 
   /// The context with nesessary handlers.
   context_ptr context;

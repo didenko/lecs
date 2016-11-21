@@ -16,13 +16,22 @@
 
 namespace asios {
 
+connection::endpoint_address::operator std::string() const
+{
+  if (err) return "unknown: " + err.message();
+  return addr.to_string() + ":" + std::to_string(port);
+}
+
 connection::connection(
   asio::ip::tcp::socket socket,
   context_ptr context
 )
   : socket_(std::move(socket)),
   context(context)
-{}
+{
+  endpoint_local();
+  endpoint_remote();
+}
 
 void connection::start()
 {
@@ -34,27 +43,29 @@ void connection::stop()
   socket_.close();
 }
 
-std::tuple<asio::ip::tcp::endpoint, asio::error_code> connection::endpoint_local() const
+const connection::endpoint_address &connection::endpoint_local()
 {
-  asio::error_code ec;
-  auto ep = socket_.local_endpoint(ec);
-  return std::make_tuple(
-    std::move(ep),
-    std::move(ec)
-  );
+  if (!local.err) return local;
+  auto ep = socket_.local_endpoint(local.err);
+  if (!local.err)
+  {
+    local.addr = ep.address();
+    local.port = ep.port();
+  }
+  return local;
 };
 
-std::tuple<asio::ip::tcp::endpoint, asio::error_code> connection::endpoint_remote() const
+const connection::endpoint_address &connection::endpoint_remote()
 {
-  asio::error_code ec;
-  auto ep = socket_.remote_endpoint(ec);
-  return std::make_tuple(
-    std::move(ep),
-    std::move(ec)
-  );
+  if (!remote.err) return remote;
+  auto ep = socket_.remote_endpoint(remote.err);
+  if (!remote.err)
+  {
+    remote.addr = ep.address();
+    remote.port = ep.port();
+  }
+  return remote;
 };
-
-std::tuple<asio::ip::tcp::endpoint, asio::error_code> connection::endpoint_remote() const;
 
 void connection::do_read()
 {

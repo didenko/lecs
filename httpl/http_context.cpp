@@ -74,12 +74,7 @@ std::vector<asio::const_buffer> http_context::on_write(asios::connection_ptr con
 
 std::string http_context::endpoint(asios::connection_ptr conn, bool remote)
 {
-  asio::error_code ec;
-  asio::ip::tcp::endpoint ep;
-  std::tie(ep, ec) = remote ? conn->endpoint_remote() : conn->endpoint_local();
-
-  if (ec) { return "unknown: " + ec.message(); }
-  return ep.address().to_string() + ":" + std::to_string(ep.port());
+  return remote ? conn->endpoint_remote() : conn->endpoint_local();
 }
 
 }
