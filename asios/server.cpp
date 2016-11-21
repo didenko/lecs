@@ -68,6 +68,8 @@ void server::run()
   io_service_.run();
 }
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "InfiniteRecursion"
 void server::do_accept()
 {
   acceptor_.async_accept(

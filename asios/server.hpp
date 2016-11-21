@@ -14,7 +14,6 @@
 #include <asio.hpp>
 #include <string>
 #include "connection.hpp"
-
 #include "context.hpp"
 
 namespace asios {
