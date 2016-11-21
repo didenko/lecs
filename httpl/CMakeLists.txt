@@ -16,3 +16,6 @@ add_library(
 )
 
 add_dependencies(httpl asios)
+
+add_executable(http_example http_example.cpp)
+target_link_libraries(http_example asios httpl)

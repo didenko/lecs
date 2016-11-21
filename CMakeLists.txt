@@ -14,6 +14,3 @@ include_directories(
 
 add_subdirectory(asios)
 add_subdirectory(httpl)
-
-add_executable(http_example http_example.cpp)
-target_link_libraries(http_example asios httpl)
