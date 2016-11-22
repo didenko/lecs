@@ -103,17 +103,9 @@ void connection::do_write(const std::vector<asio::const_buffer> & buffers)
     socket_,
     buffers,
     [this, self](std::error_code ec, std::size_t) {
-      if (!ec) // TODO log this ec
+      if (ec)
       {
-        asio::error_code ignored_ec; // TODO log this ec
-        socket_.shutdown(
-          asio::ip::tcp::socket::shutdown_both,
-          ignored_ec
-        );
-      }
-
-      if (ec != asio::error::operation_aborted)
-      {
+        std::cerr << "post-write to " << std::string(remote) << ": " << ec.message() << std::endl;
         context->on_disconnect(shared_from_this());
       }
     }
