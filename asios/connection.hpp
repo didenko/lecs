@@ -58,6 +58,8 @@ public:
   /// Perform an asynchronous write operation.
   void do_write();
 
+  void do_write(const std::vector<asio::const_buffer> &);
+
 private:
   /// Perform an asynchronous read operation.
   void do_read();

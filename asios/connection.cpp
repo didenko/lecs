@@ -96,17 +96,16 @@ void connection::do_read()
     });
 }
 
-void connection::do_write()
+void connection::do_write(const std::vector<asio::const_buffer> & buffers)
 {
   auto self(shared_from_this());
   asio::async_write(
     socket_,
-    context->on_write(self),
+    buffers,
     [this, self](std::error_code ec, std::size_t) {
-      if (!ec)
+      if (!ec) // TODO log this ec
       {
-        // Initiate graceful connection closure.
-        asio::error_code ignored_ec;
+        asio::error_code ignored_ec; // TODO log this ec
         socket_.shutdown(
           asio::ip::tcp::socket::shutdown_both,
           ignored_ec
@@ -117,7 +116,14 @@ void connection::do_write()
       {
         context->on_disconnect(shared_from_this());
       }
-    });
+    }
+  );
+}
+
+void connection::do_write()
+{
+  auto self(shared_from_this());
+  do_write(context->on_write(self));
 }
 
 }
