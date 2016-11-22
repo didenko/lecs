@@ -14,7 +14,7 @@
 namespace les {
 
 Context::Context()
-  : Context([](les::Message m) {})
+  : Context([](asios::connection_ptr, les::Message m) {})
 {}
 
 Context::Context(Intake i)
@@ -51,16 +51,28 @@ asios::next Context::on_read(
     last{cursor + sz - 1};
 
   Message raw_message;
+
   while (get_line(raw_message, cursor, last))
-    intake(std::move(raw_message));
+    intake(conn, std::move(raw_message));
+
+  if (raw_message != "") // TODO better handling og the final empty string?
+    intake(conn, std::move(raw_message));
 
   return asios::next::read;
 }
 
 std::vector<asio::const_buffer> Context::on_write(asios::connection_ptr)
 {
+  assert(false);
   std::vector<asio::const_buffer> buffers;
   return buffers;
+}
+
+void Context::write(asios::connection_ptr conn, const std::string &messages)
+{
+  std::vector<asio::const_buffer> buffers;
+  buffers.push_back(asio::buffer(messages));
+  conn->do_write(buffers);
 }
 
 bool Context::get_line(Message &msg, Cursor &current, const Cursor &last)

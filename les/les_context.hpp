@@ -19,7 +19,7 @@ constexpr asios::buffer::value_type eol{'\n'};
 
 using Message = std::string;
 using Cursor = asios::buffer::const_iterator;
-using Intake= std::function<void(Message &&)>;
+using Intake= std::function<void(asios::connection_ptr, Message &&)>;
 
 class Context
 {
@@ -37,6 +37,8 @@ public:
   asios::next on_read(asios::connection_ptr, const asios::buffer &, std::size_t);
 
   std::vector<asio::const_buffer> on_write(asios::connection_ptr);
+
+  void write(asios::connection_ptr, const std::string &);
 
 private:
   const Intake intake;
