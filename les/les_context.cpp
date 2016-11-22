@@ -55,9 +55,6 @@ asios::next Context::on_read(
   while (get_line(raw_message, cursor, last))
     intake(conn, std::move(raw_message));
 
-  if (raw_message != "") // TODO better handling og the final empty string?
-    intake(conn, std::move(raw_message));
-
   return asios::next::read;
 }
 
@@ -77,18 +74,15 @@ void Context::write(asios::connection_ptr conn, const std::string &messages)
 
 bool Context::get_line(Message &msg, Cursor &current, const Cursor &last)
 {
+  if (current == last) return false;
+
   Cursor first{current};
 
   while (current != last && *current != eol) ++current;
 
-  if (current == last)
-  {
-    msg.assign(first, current);
-    return false;
-  }
-
   msg.assign(first, current);
-  ++current;
+
+  if (current != last) ++current;
   return true;
 }
 

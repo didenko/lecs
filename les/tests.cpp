@@ -42,6 +42,10 @@ TEST_F(ContextUtility, separate)
   ASSERT_EQ(cur, buf.begin() + 12);
   ASSERT_EQ(m, "");
 
+  ASSERT_TRUE(get_line(m, cur, last));
+  ASSERT_EQ(cur, last);
+  ASSERT_EQ(m, "ZYXWVUTSRQP");
+
   ASSERT_FALSE(get_line(m, cur, last));
   ASSERT_EQ(cur, last);
   ASSERT_EQ(m, "ZYXWVUTSRQP");
