@@ -18,7 +18,7 @@ using buffer = std::array<char, 8192>;
 
 enum class next
 {
-  read, write, diconnect
+  read, write, disconnect
 };
 
 class connection;

@@ -83,7 +83,7 @@ void connection::do_read()
           case next::write:
             do_write();
             break;
-          case next::diconnect:
+          case next::disconnect:
             context->on_disconnect(self);
             raise(SIGTERM);
             break;
