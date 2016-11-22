@@ -27,8 +27,9 @@ int main(int argc, char *argv[])
     }
 
     les::Context handlers(
-      [](les::Message m) {
-        std::cout << ":> " << m << std::endl;
+      [&handlers](asios::connection_ptr conn, les::Message m) {
+        handlers.write(conn, m);
+        std::cout << std::string(conn->endpoint_remote()) << " :> " << m << std::endl;
       }
     );
 
