@@ -18,14 +18,15 @@
 namespace asios {
 
 server::server(
+  context_ptr context,
   const std::string &address,
-  const std::string &port,
-  context_ptr context
+  const std::string &port
 ) :
   io_service_(),
   signals_(io_service_),
   acceptor_(io_service_),
   socket_(io_service_),
+  resolver_(io_service_),
   context(context)
 {
   // Register to handle the signals that indicate when the server should exit.
@@ -40,17 +41,21 @@ server::server(
 
   do_await_stop();
 
+  if (address != "") start_accept(address, port);
+}
+
+void server::start_accept(const std::string &address, const std::string &port)
+{
   // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
-  asio::ip::tcp::resolver resolver{io_service_};
   asio::error_code ec;
-  auto ep_iter = resolver.resolve({address, port}, ec);
+  auto endpoints = resolver_.resolve({address, port}, ec);
   if (ec)
   {
     std::cerr << "Failed to resolve the listen address: " << ec.message() << std::endl;
     raise(SIGTERM);
   };
 
-  asio::ip::tcp::endpoint endpoint{*ep_iter};
+  asio::ip::tcp::endpoint endpoint{*endpoints};
   acceptor_.open(endpoint.protocol());
   acceptor_.set_option(asio::ip::tcp::acceptor::reuse_address(true));
   acceptor_.bind(endpoint);
@@ -68,8 +73,32 @@ void server::run()
   io_service_.run();
 }
 
+asio::error_code server::connect(const asio::ip::tcp::resolver::query &remote)
+{
+  asio::error_code ec;
+  auto endpoints = resolver_.resolve(remote, ec);
+  if (ec) return ec;
+
+  asio::async_connect(
+    socket_,
+    endpoints,
+    [this](std::error_code ec, asio::ip::tcp::resolver::iterator) {
+      if (!ec)
+      {
+        context->on_connect(
+          std::make_shared<connection>(
+            std::move(socket_),
+            context
+          )
+        );
+      }
+    });
+
+}
+
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "InfiniteRecursion"
+
 void server::do_accept()
 {
   acceptor_.async_accept(

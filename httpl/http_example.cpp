@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
       std::bind(&httpl::http_context::on_write, &handlers, _1)
     );
     // Initialise the server.
-    asios::server s(argv[1], argv[2], context);
+    asios::server s(context, argv[1], argv[2]);
 
     // Run the server until stopped.
     s.run();
