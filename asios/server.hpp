@@ -61,9 +61,7 @@ private:
   /// Acceptor used to listen for incoming connections.
   asio::ip::tcp::acceptor acceptor_;
 
-  // TODO: Is it OK (in this code) to share the socket object between acceptors and connectors?
-
-  /// The next socket to be accepted or connected to
+  /// The next socket to be accepted
   asio::ip::tcp::socket socket_;
 
   /// The handler for all incoming requests.

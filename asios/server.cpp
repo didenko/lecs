@@ -79,21 +79,24 @@ asio::error_code server::connect(const asio::ip::tcp::resolver::query &remote)
   auto endpoints = resolver_.resolve(remote, ec);
   if (ec) return ec;
 
+  auto socket_ptr = std::make_shared<asio::ip::tcp::socket>(io_service_);
+
   asio::async_connect(
-    socket_,
+    *socket_ptr,
     endpoints,
-    [this](std::error_code ec, asio::ip::tcp::resolver::iterator) {
-      if (!ec)
+    [this, socket_ptr](std::error_code ecc, asio::ip::tcp::resolver::iterator) {
+      if (!ecc)
       {
         context->on_connect(
           std::make_shared<connection>(
-            std::move(socket_),
+            std::move(*socket_ptr),
             context
           )
         );
       }
-    });
-
+    }
+  );
+  return ec;
 }
 
 #pragma clang diagnostic push
