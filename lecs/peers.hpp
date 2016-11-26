@@ -1,5 +1,5 @@
 //
-// les_peers.hpp
+// peers.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~
 //
 // Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
@@ -15,7 +15,7 @@
 #include <shared_mutex>
 #include "asios/connection.hpp"
 
-namespace les {
+namespace lecs {
 
 class Peers
 {

@@ -1,5 +1,5 @@
 //
-// main.cpp
+// example.cpp
 // ~~~~~~~~
 //
 // Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
@@ -13,7 +13,7 @@
 
 #include <asio.hpp>
 #include "asios/node.hpp"
-#include "les/les_context.hpp"
+#include "lecs/context.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -26,8 +26,8 @@ int main(int argc, char *argv[])
       return 1;
     }
 
-    les::Context handlers(
-      [&handlers](asios::connection_ptr conn, les::Message m) {
+    lecs::Context handlers(
+      [&handlers](asios::connection_ptr conn, lecs::Message m) {
         handlers.write(conn, m + "\n");
         std::cout << std::string(conn->endpoint_remote()) << " :> " << m << std::endl;
       }
@@ -35,14 +35,14 @@ int main(int argc, char *argv[])
 
     using namespace std::placeholders;
     auto context = std::make_shared<asios::Context>(
-      std::bind(&les::Context::on_connect, &handlers, _1),
-      std::bind(&les::Context::on_disconnect, &handlers, _1),
-      std::bind(&les::Context::shutdown, &handlers),
-      std::bind(&les::Context::on_read, &handlers, _1, _2, _3),
-      std::bind(&les::Context::on_write, &handlers, _1)
+      std::bind(&lecs::Context::on_connect, &handlers, _1),
+      std::bind(&lecs::Context::on_disconnect, &handlers, _1),
+      std::bind(&lecs::Context::shutdown, &handlers),
+      std::bind(&lecs::Context::on_read, &handlers, _1, _2, _3),
+      std::bind(&lecs::Context::on_write, &handlers, _1)
     );
     // Initialise the server.
-    asios::node s(context, argv[1], argv[2]);
+    asios::Node s(context, argv[1], argv[2]);
 
     // Run the server until stopped.
     s.run();

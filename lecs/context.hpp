@@ -1,5 +1,5 @@
 //
-// les_context.hpp
+// context.hpp
 // ~~~~~~~~~~~~~~~~
 //
 // Copyright (c) 2016 Vlad Didenko (business at didenko dot com)
@@ -11,9 +11,9 @@
 #pragma once
 
 #include "asios/node.hpp"
-#include "les_peers.hpp"
+#include "peers.hpp"
 
-namespace les {
+namespace lecs {
 
 constexpr asios::buffer::value_type eol{'\n'};
 

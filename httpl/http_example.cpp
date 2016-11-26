@@ -1,5 +1,5 @@
 //
-// main.cpp
+// http_example.cpp
 // ~~~~~~~~
 //
 // Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
       std::bind(&httpl::http_context::on_write, &handlers, _1)
     );
     // Initialise the server.
-    asios::node s(context, argv[1], argv[2]);
+    asios::Node s(context, argv[1], argv[2]);
 
     // Run the server until stopped.
     s.run();

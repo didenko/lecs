@@ -1,5 +1,5 @@
 //
-// tests.hpp
+// context_test.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~
 //
 // Copyright (c) 2016 Vlad Didenko (business at didenko dot com)
@@ -12,21 +12,21 @@
 #include <cstring>
 
 #include <gtest/gtest.h>
-#include "les_context.hpp"
+#include "context.hpp"
 
 namespace tests {
-namespace les {
+namespace lecs {
 
-struct ContextUtility: public ::testing::Test, public ::les::Context
+struct ContextUtility: public ::testing::Test, public ::lecs::Context
 {
   #define INPUT "123456\nabc\n\nZYXWVUTSRQP"
   ::asios::buffer buf{INPUT};
 };
 
-TEST_F(ContextUtility, separate)
+TEST_F(ContextUtility, get_line)
 {
-  ::les::Message m;
-  ::les::Cursor
+  ::lecs::Message m;
+  ::lecs::Cursor
     cur{buf.begin()},
     last{cur + std::strlen(INPUT)};
 

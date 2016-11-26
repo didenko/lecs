@@ -1,5 +1,5 @@
 //
-// les_context.cpp
+// context.cpp
 // ~~~~~~~~~~~~~~~~
 //
 // Copyright (c) 2016 Vlad Didenko (business at didenko dot com)
@@ -9,12 +9,12 @@
 //
 
 #include <iostream>
-#include "les_context.hpp"
+#include "context.hpp"
 
-namespace les {
+namespace lecs {
 
 Context::Context()
-  : Context([](asios::connection_ptr, les::Message m) {})
+  : Context([](asios::connection_ptr, lecs::Message m) {})
 {}
 
 Context::Context(Intake i)

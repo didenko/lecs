@@ -1,5 +1,5 @@
 //
-// server.hpp
+// node.hpp
 // ~~~~~~~~~~
 //
 // Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
@@ -19,16 +19,16 @@
 namespace asios {
 
 /// The top-level class of the HTTP server.
-class node
+class Node
 {
 public:
-  node(const node &) = delete;
+  Node(const Node &) = delete;
 
-  node &operator=(const node &) = delete;
+  Node &operator=(const Node &) = delete;
 
   /// Construct the server to listen on the specified TCP address and port, and
   /// serve up files from the given directory.
-  explicit node(
+  explicit Node(
     context_ptr context,
     const std::string &address = "",
     const std::string &port = ""

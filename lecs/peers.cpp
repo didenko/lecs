@@ -1,5 +1,5 @@
 //
-// les_peers.cpp
+// peers.cpp
 // ~~~~~~~~~~~~~~~~~~~~~~
 //
 // Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
@@ -9,9 +9,9 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include "les_peers.hpp"
+#include "peers.hpp"
 
-namespace les {
+namespace lecs {
 
 Peers::Peers()
 {}

@@ -1,5 +1,5 @@
 //
-// server.cpp
+// node.cpp
 // ~~~~~~~~~~
 //
 // Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
@@ -17,7 +17,7 @@
 
 namespace asios {
 
-node::node(
+Node::Node(
   context_ptr context,
   const std::string &address,
   const std::string &port
@@ -44,7 +44,7 @@ node::node(
   if (address != "") start_accept(address, port);
 }
 
-void node::start_accept(const std::string &address, const std::string &port)
+void Node::start_accept(const std::string &address, const std::string &port)
 {
   // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
   asio::error_code ec;
@@ -64,7 +64,7 @@ void node::start_accept(const std::string &address, const std::string &port)
   do_accept();
 }
 
-void node::run()
+void Node::run()
 {
   // The io_service::run() call will block until all asynchronous operations
   // have finished. While the server is running, there is always at least one
@@ -73,7 +73,7 @@ void node::run()
   io_service_.run();
 }
 
-asio::error_code node::connect(const asio::ip::tcp::resolver::query &remote)
+asio::error_code Node::connect(const asio::ip::tcp::resolver::query &remote)
 {
   asio::error_code ec;
   auto endpoints = resolver_.resolve(remote, ec);
@@ -102,7 +102,7 @@ asio::error_code node::connect(const asio::ip::tcp::resolver::query &remote)
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "InfiniteRecursion"
 
-void node::do_accept()
+void Node::do_accept()
 {
   acceptor_.async_accept(
     socket_,
@@ -125,7 +125,7 @@ void node::do_accept()
     });
 }
 
-void node::do_await_stop()
+void Node::do_await_stop()
 {
   signals_.async_wait(
     [this](std::error_code /*ec*/, int /*signo*/) {
