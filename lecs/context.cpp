@@ -14,24 +14,28 @@
 namespace lecs {
 
 Context::Context()
-  : Context([](asios::connection_ptr, lecs::Message m) {})
+  : Context(
+  [](asios::connection_ptr) {},
+  [](asios::connection_ptr) {},
+  [](asios::connection_ptr, lecs::Message m) {}
+)
 {}
 
-Context::Context(Intake i)
+Context::Context(OnConnect c, OnDisconnect d, Intake i)
   : intake(i)
 {}
 
 void Context::on_connect(asios::connection_ptr conn)
 {
   peers.add(conn);
-  std::cerr << "Connection from: " << endpoint(conn) << std::endl;
+  on_conn(conn);
 }
 
 void Context::on_disconnect(asios::connection_ptr conn)
 {
+  on_disc(conn);
   conn->stop();
   peers.del(conn);
-  std::cerr << "Disconnected from: " << endpoint(conn) << std::endl;
 }
 
 void Context::shutdown(void)

@@ -27,6 +27,12 @@ int main(int argc, char *argv[])
     }
 
     lecs::Context handlers(
+      [](asios::connection_ptr conn) {
+        std::cerr << "Connection from: " << std::string(conn->endpoint_remote()) << std::endl;
+      },
+      [](asios::connection_ptr conn) {
+        std::cerr << "Disconnected from: " << std::string(conn->endpoint_remote()) << std::endl;
+      },
       [&handlers](asios::connection_ptr conn, lecs::Message m) {
         handlers.write(conn, m + "\n");
         std::cout << std::string(conn->endpoint_remote()) << " :> " << m << std::endl;

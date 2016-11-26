@@ -19,6 +19,8 @@ constexpr asios::buffer::value_type eol{'\n'};
 
 using Message = std::string;
 using Cursor = asios::buffer::const_iterator;
+using OnConnect = std::function<void(asios::connection_ptr)>;
+using OnDisconnect = std::function<void(asios::connection_ptr)>;
 using Intake= std::function<void(asios::connection_ptr, Message &&)>;
 
 class Context
@@ -26,7 +28,7 @@ class Context
 public:
   Context();
 
-  Context(Intake);
+  Context(OnConnect, OnDisconnect, Intake);
 
   void on_connect(asios::connection_ptr);
 
@@ -41,6 +43,8 @@ public:
   void write(asios::connection_ptr, const std::string &);
 
 private:
+  const OnConnect on_conn;
+  const OnDisconnect on_disc;
   const Intake intake;
   Peers peers;
 
