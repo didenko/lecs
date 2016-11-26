@@ -19,16 +19,16 @@
 namespace asios {
 
 /// The top-level class of the HTTP server.
-class server
+class node
 {
 public:
-  server(const server &) = delete;
+  node(const node &) = delete;
 
-  server &operator=(const server &) = delete;
+  node &operator=(const node &) = delete;
 
   /// Construct the server to listen on the specified TCP address and port, and
   /// serve up files from the given directory.
-  explicit server(
+  explicit node(
     context_ptr context,
     const std::string &address = "",
     const std::string &port = ""

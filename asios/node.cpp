@@ -13,11 +13,11 @@
 #include <utility>
 #include <iostream>
 
-#include "server.hpp"
+#include "node.hpp"
 
 namespace asios {
 
-server::server(
+node::node(
   context_ptr context,
   const std::string &address,
   const std::string &port
@@ -44,7 +44,7 @@ server::server(
   if (address != "") start_accept(address, port);
 }
 
-void server::start_accept(const std::string &address, const std::string &port)
+void node::start_accept(const std::string &address, const std::string &port)
 {
   // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
   asio::error_code ec;
@@ -64,7 +64,7 @@ void server::start_accept(const std::string &address, const std::string &port)
   do_accept();
 }
 
-void server::run()
+void node::run()
 {
   // The io_service::run() call will block until all asynchronous operations
   // have finished. While the server is running, there is always at least one
@@ -73,7 +73,7 @@ void server::run()
   io_service_.run();
 }
 
-asio::error_code server::connect(const asio::ip::tcp::resolver::query &remote)
+asio::error_code node::connect(const asio::ip::tcp::resolver::query &remote)
 {
   asio::error_code ec;
   auto endpoints = resolver_.resolve(remote, ec);
@@ -102,7 +102,7 @@ asio::error_code server::connect(const asio::ip::tcp::resolver::query &remote)
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "InfiniteRecursion"
 
-void server::do_accept()
+void node::do_accept()
 {
   acceptor_.async_accept(
     socket_,
@@ -125,7 +125,7 @@ void server::do_accept()
     });
 }
 
-void server::do_await_stop()
+void node::do_await_stop()
 {
   signals_.async_wait(
     [this](std::error_code /*ec*/, int /*signo*/) {

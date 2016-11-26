@@ -3,7 +3,7 @@ set(
 
     connection.cpp
     context.cpp
-    server.cpp
+    node.cpp
 )
 
 add_library(

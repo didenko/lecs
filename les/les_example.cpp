@@ -12,7 +12,7 @@
 #include <iostream>
 
 #include <asio.hpp>
-#include "asios/server.hpp"
+#include "asios/node.hpp"
 #include "les/les_context.hpp"
 
 int main(int argc, char *argv[])
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
       std::bind(&les::Context::on_write, &handlers, _1)
     );
     // Initialise the server.
-    asios::server s(context, argv[1], argv[2]);
+    asios::node s(context, argv[1], argv[2]);
 
     // Run the server until stopped.
     s.run();

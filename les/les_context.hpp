@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "asios/server.hpp"
+#include "asios/node.hpp"
 #include "les_peers.hpp"
 
 namespace les {
