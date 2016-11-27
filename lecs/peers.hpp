@@ -28,14 +28,14 @@ public:
 
   ~Peers();
 
-  void add(asios::connection_ptr);
+  void add(asion::connection_ptr);
 
-  void del(asios::connection_ptr);
+  void del(asion::connection_ptr);
 
   void shutdown();
 
 private:
-  std::set<asios::connection_ptr> conns;
+  std::set<asion::connection_ptr> conns;
   std::shared_timed_mutex peers_lock;
 };
 

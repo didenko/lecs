@@ -27,20 +27,20 @@ int main(int argc, char *argv[])
     }
 
     lecs::Context handlers{
-      [](asios::connection_ptr conn) {
+      [](asion::connection_ptr conn) {
         std::cerr << "Connection from: " << std::string(conn->endpoint_remote()) << std::endl;
       },
-      [](asios::connection_ptr conn) {
+      [](asion::connection_ptr conn) {
         std::cerr << "Disconnected from: " << std::string(conn->endpoint_remote()) << std::endl;
       },
-      [&handlers](asios::connection_ptr conn, lecs::Message m) {
+      [&handlers](asion::connection_ptr conn, lecs::Message m) {
         handlers.write(conn, m + "\n");
         std::cout << std::string(conn->endpoint_remote()) << " :> " << m << std::endl;
       }
     };
 
     using namespace std::placeholders;
-    auto context = std::make_shared<asios::Context>(
+    auto context = std::make_shared<asion::Context>(
       std::bind(&lecs::Context::on_connect, &handlers, _1),
       std::bind(&lecs::Context::on_disconnect, &handlers, _1),
       std::bind(&lecs::Context::shutdown, &handlers),
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
       std::bind(&lecs::Context::on_write, &handlers, _1)
     );
     // Initialise the server.
-    asios::Node s(context, argv[1], argv[2]);
+    asion::Node s(context, argv[1], argv[2]);
 
     // Run the server until stopped.
     s.run();

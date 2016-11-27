@@ -21,7 +21,7 @@ Peers::~Peers()
   shutdown();
 }
 
-void Peers::add(asios::connection_ptr c)
+void Peers::add(asion::connection_ptr c)
 {
   {
     std::lock_guard <std::shared_timed_mutex> lock(peers_lock);
@@ -30,7 +30,7 @@ void Peers::add(asios::connection_ptr c)
   c->start();
 }
 
-void Peers::del(asios::connection_ptr c)
+void Peers::del(asion::connection_ptr c)
 {
   {
     std::lock_guard <std::shared_timed_mutex> lock(peers_lock);

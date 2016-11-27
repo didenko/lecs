@@ -12,6 +12,6 @@ include_directories(
     "${CMAKE_SOURCE_DIR}"
 )
 
-add_subdirectory(asios)
+add_subdirectory(asion)
 add_subdirectory(httpl)
 add_subdirectory(lecs)

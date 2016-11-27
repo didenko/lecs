@@ -19,13 +19,13 @@ http_context::http_context(
   : handler(doc_root)
 {};
 
-void http_context::on_connect(asios::connection_ptr conn)
+void http_context::on_connect(asion::connection_ptr conn)
 {
   connections.add(conn);
   std::cerr << "Accepted: " << endpoint(conn) << std::endl;
 }
 
-void http_context::on_disconnect(asios::connection_ptr conn)
+void http_context::on_disconnect(asion::connection_ptr conn)
 {
   auto ep = endpoint(conn);
   connections.del(conn);
@@ -38,7 +38,7 @@ void http_context::shutdown(void)
   connections.shutdown();
 }
 
-asios::next http_context::on_read(asios::connection_ptr conn, const asios::buffer &buffer, std::size_t sz)
+asion::next http_context::on_read(asion::connection_ptr conn, const asion::buffer &buffer, std::size_t sz)
 {
   request_parser::result_type result;
 
@@ -55,24 +55,24 @@ asios::next http_context::on_read(asios::connection_ptr conn, const asios::buffe
     case decltype(result)::good:
       handler.handle_request(client->request, client->reply);
       conn->do_write();
-      return asios::next::read;
+      return asion::next::read;
 
     case decltype(result)::bad:
       client->reply = httpl::reply::stock_reply(httpl::reply::bad_request);
-      return asios::next::write;
+      return asion::next::write;
 
     case decltype(result)::indeterminate:
-      return asios::next::read;
+      return asion::next::read;
   }
 }
 
-std::vector<asio::const_buffer> http_context::on_write(asios::connection_ptr conn)
+std::vector<asio::const_buffer> http_context::on_write(asion::connection_ptr conn)
 {
   auto client = connections.at(conn); //TODO: handle std::out_of_range
   return client->reply.to_buffers();
 };
 
-std::string http_context::endpoint(asios::connection_ptr conn, bool remote)
+std::string http_context::endpoint(asion::connection_ptr conn, bool remote)
 {
   return remote ? conn->endpoint_remote() : conn->endpoint_local();
 }

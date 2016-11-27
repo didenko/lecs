@@ -20,19 +20,19 @@ namespace lecs {
 struct Nodes: public ::testing::Test
 {
   ::lecs::Context handlers{
-    [](::asios::connection_ptr conn) {
+    [](::asion::connection_ptr conn) {
       std::cerr << "Connection from: " << std::string(conn->endpoint_remote()) << std::endl;
     },
-    [](::asios::connection_ptr conn) {
+    [](::asion::connection_ptr conn) {
       std::cerr << "Disconnected from: " << std::string(conn->endpoint_remote()) << std::endl;
     },
-    [this](::asios::connection_ptr conn, ::lecs::Message m) {
+    [this](::asion::connection_ptr conn, ::lecs::Message m) {
       handlers.write(conn, m + "\n");
       std::cout << std::string(conn->endpoint_remote()) << " :> " << m << std::endl;
     }
   };
 
-  std::shared_ptr<asios::Context> context = std::make_shared<asios::Context>(
+  std::shared_ptr<asion::Context> context = std::make_shared<asion::Context>(
     std::bind(&::lecs::Context::on_connect, &handlers, std::placeholders::_1),
     std::bind(&::lecs::Context::on_disconnect, &handlers, std::placeholders::_1),
     std::bind(&::lecs::Context::shutdown, &handlers),
@@ -44,7 +44,7 @@ struct Nodes: public ::testing::Test
     std::bind(&::lecs::Context::on_write, &handlers, std::placeholders::_1)
   );
 
-  asios::Node
+  asion::Node
     server{context},
     client{context},
     cliser{context};

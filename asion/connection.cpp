@@ -14,7 +14,7 @@
 
 #include "connection.hpp"
 
-namespace asios {
+namespace asion {
 
 connection::endpoint_address::operator std::string() const
 {

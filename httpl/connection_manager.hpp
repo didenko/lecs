@@ -30,16 +30,16 @@ public:
 
   ~connection_manager();
 
-  void add(asios::connection_ptr);
+  void add(asion::connection_ptr);
 
-  void del(asios::connection_ptr);
+  void del(asion::connection_ptr);
 
-  const client::ptr at(asios::connection_ptr);
+  const client::ptr at(asion::connection_ptr);
 
   void shutdown();
 
 private:
-  std::map<asios::connection_ptr, client::ptr> clients;
+  std::map<asion::connection_ptr, client::ptr> clients;
   std::shared_timed_mutex clients_lock;
 };
 

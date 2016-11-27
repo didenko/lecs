@@ -12,7 +12,7 @@
 
 #include <asio.hpp>
 
-namespace asios {
+namespace asion {
 
 using buffer = std::array<char, 8192>;
 

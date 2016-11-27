@@ -21,7 +21,7 @@ connection_manager::~connection_manager()
   shutdown();
 }
 
-void connection_manager::add(asios::connection_ptr c)
+void connection_manager::add(asion::connection_ptr c)
 {
   {
     std::lock_guard<std::shared_timed_mutex> lock(clients_lock);
@@ -30,7 +30,7 @@ void connection_manager::add(asios::connection_ptr c)
   c->start();
 }
 
-void connection_manager::del(asios::connection_ptr c)
+void connection_manager::del(asion::connection_ptr c)
 {
   {
     std::lock_guard<std::shared_timed_mutex> lock(clients_lock);
@@ -39,7 +39,7 @@ void connection_manager::del(asios::connection_ptr c)
   c->stop();
 }
 
-const client::ptr connection_manager::at(asios::connection_ptr conn)
+const client::ptr connection_manager::at(asion::connection_ptr conn)
 {
   std::shared_lock<std::shared_timed_mutex> lock(clients_lock);
   return clients.at(conn);

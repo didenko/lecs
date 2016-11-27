@@ -20,7 +20,7 @@ namespace lecs {
 struct ContextUtility: public ::testing::Test, public ::lecs::Context
 {
   #define INPUT "123456\nabc\n\nZYXWVUTSRQP"
-  ::asios::buffer buf{INPUT};
+  ::asion::buffer buf{INPUT};
 };
 
 TEST_F(ContextUtility, get_line)

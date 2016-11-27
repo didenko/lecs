@@ -15,9 +15,9 @@ namespace lecs {
 
 Context::Context()
   : Context(
-  [](asios::connection_ptr) {},
-  [](asios::connection_ptr) {},
-  [](asios::connection_ptr, lecs::Message m) {}
+  [](asion::connection_ptr) {},
+  [](asion::connection_ptr) {},
+  [](asion::connection_ptr, lecs::Message m) {}
 )
 {}
 
@@ -27,13 +27,13 @@ Context::Context(OnConnect c, OnDisconnect d, Intake i) :
   intake(i)
 {}
 
-void Context::on_connect(asios::connection_ptr conn)
+void Context::on_connect(asion::connection_ptr conn)
 {
   peers.add(conn);
   on_conn(conn);
 }
 
-void Context::on_disconnect(asios::connection_ptr conn)
+void Context::on_disconnect(asion::connection_ptr conn)
 {
   on_disc(conn);
   conn->stop();
@@ -46,9 +46,9 @@ void Context::shutdown(void)
   std::cerr << "The server is shutting down." << std::endl;
 }
 
-asios::next Context::on_read(
-  asios::connection_ptr conn,
-  const asios::buffer &buf,
+asion::next Context::on_read(
+  asion::connection_ptr conn,
+  const asion::buffer &buf,
   std::size_t sz
 )
 {
@@ -61,17 +61,17 @@ asios::next Context::on_read(
   while (get_line(raw_message, cursor, last))
     intake(conn, std::move(raw_message));
 
-  return asios::next::read;
+  return asion::next::read;
 }
 
-std::vector<asio::const_buffer> Context::on_write(asios::connection_ptr)
+std::vector<asio::const_buffer> Context::on_write(asion::connection_ptr)
 {
   assert(false);
   std::vector<asio::const_buffer> buffers;
   return buffers;
 }
 
-void Context::write(asios::connection_ptr conn, const std::string &messages)
+void Context::write(asion::connection_ptr conn, const std::string &messages)
 {
   std::vector<asio::const_buffer> buffers;
   buffers.push_back(asio::buffer(messages));
@@ -92,7 +92,7 @@ bool Context::get_line(Message &msg, Cursor &current, const Cursor &last)
   return true;
 }
 
-std::string Context::endpoint(asios::connection_ptr conn, bool remote)
+std::string Context::endpoint(asion::connection_ptr conn, bool remote)
 {
   return remote ? conn->endpoint_remote() : conn->endpoint_local();
 }

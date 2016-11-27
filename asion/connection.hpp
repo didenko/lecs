@@ -16,7 +16,7 @@
 #include <asio.hpp>
 #include "context.hpp"
 
-namespace asios {
+namespace asion {
 
 class connection_manager;
 
