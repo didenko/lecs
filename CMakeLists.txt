@@ -13,5 +13,4 @@ include_directories(
 )
 
 add_subdirectory(asion)
-add_subdirectory(httpl)
 add_subdirectory(lecs)

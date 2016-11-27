@@ -1,3 +1,0 @@
-`httpl` namespace is a factored-out portion of _asio_'s `c11/http/server` example. Unlike the `asion` namespace this is the code which gathers the example's behaviours specific to HTTP communications. That includes, without limitation, request-reply expectations, sharacter-based protocol, headers structure, etc.
- 
- The `asio` http server example itself is just that - an example. It does not aim nor pretend to present a working standard-compliant HTTP server, even 1.0. A lot of things missing - most header processing, keep-alive connections, request pipelining, etc.
