@@ -27,6 +27,18 @@ Context::Context(OnConnect c, OnDisconnect d, Intake i) :
   intake(i)
 {}
 
+asion::context_ptr Context::node_context()
+{
+  using namespace std::placeholders;
+  return std::make_shared<asion::Context>(
+    std::bind(&::lecs::Context::on_connect, this, _1),
+    std::bind(&::lecs::Context::on_disconnect, this, _1),
+    std::bind(&::lecs::Context::shutdown, this),
+    std::bind(&::lecs::Context::on_read, this, _1, _2, _3),
+    std::bind(&::lecs::Context::on_write, this, _1)
+  );
+}
+
 void Context::on_connect(asion::connection_ptr conn)
 {
   peers.add(conn);

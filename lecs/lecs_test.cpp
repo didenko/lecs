@@ -32,17 +32,7 @@ struct Nodes: public ::testing::Test
     }
   };
 
-  std::shared_ptr<asion::Context> context = std::make_shared<asion::Context>(
-    std::bind(&::lecs::Context::on_connect, &handlers, std::placeholders::_1),
-    std::bind(&::lecs::Context::on_disconnect, &handlers, std::placeholders::_1),
-    std::bind(&::lecs::Context::shutdown, &handlers),
-    std::bind(&::lecs::Context::on_read,
-              &handlers,
-              std::placeholders::_1,
-              std::placeholders::_2,
-              std::placeholders::_3),
-    std::bind(&::lecs::Context::on_write, &handlers, std::placeholders::_1)
-  );
+  asion::context_ptr context = handlers.node_context();
 
   asion::Node
     server{context},

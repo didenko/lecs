@@ -30,6 +30,8 @@ public:
 
   Context(OnConnect, OnDisconnect, Intake);
 
+  asion::context_ptr node_context();
+
   void on_connect(asion::connection_ptr);
 
   void on_disconnect(asion::connection_ptr);
