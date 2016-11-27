@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
       return 1;
     }
 
-    lecs::Context handlers(
+    lecs::Context handlers{
       [](asios::connection_ptr conn) {
         std::cerr << "Connection from: " << std::string(conn->endpoint_remote()) << std::endl;
       },
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
         handlers.write(conn, m + "\n");
         std::cout << std::string(conn->endpoint_remote()) << " :> " << m << std::endl;
       }
-    );
+    };
 
     using namespace std::placeholders;
     auto context = std::make_shared<asios::Context>(

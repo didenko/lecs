@@ -21,8 +21,10 @@ Context::Context()
 )
 {}
 
-Context::Context(OnConnect c, OnDisconnect d, Intake i)
-  : intake(i)
+Context::Context(OnConnect c, OnDisconnect d, Intake i) :
+  on_conn(c),
+  on_disc(d),
+  intake(i)
 {}
 
 void Context::on_connect(asios::connection_ptr conn)
