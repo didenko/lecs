@@ -37,6 +37,10 @@ public:
   /// Run the server's io_service loop.
   void run();
 
+  /// Shutdown the server.
+  void shutdown();
+
+  /// Extablish a connection.
   asio::error_code connect(const asio::ip::tcp::resolver::query &remote);
 
 private:
