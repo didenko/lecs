@@ -30,6 +30,10 @@ public:
 
   Context(OnConnect, OnDisconnect, Intake);
 
+  Context(const Context &) = delete;
+
+  Context &operator=(const Context &) = delete;
+
   asion::context_ptr node_context();
 
   void on_connect(asion::connection_ptr);
