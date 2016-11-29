@@ -107,8 +107,10 @@ void Node::do_accept()
   acceptor_.async_accept(
     socket_,
     [this](std::error_code ec) {
+
       // Check whether the server was stopped by a signal before this
       // completion handler had a chance to run.
+
       if (!acceptor_.is_open()) return;
 
       if (!ec)

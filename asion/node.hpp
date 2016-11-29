@@ -18,7 +18,7 @@
 
 namespace asion {
 
-/// The top-level class of the HTTP server.
+/// The top-level class of the server.
 class Node
 {
 public:

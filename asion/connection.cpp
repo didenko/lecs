@@ -96,7 +96,7 @@ void connection::do_read()
     });
 }
 
-void connection::do_write(const std::vector<asio::const_buffer> & buffers)
+void connection::do_write(const std::vector<asio::const_buffer> &buffers)
 {
   auto self(shared_from_this());
   asio::async_write(
