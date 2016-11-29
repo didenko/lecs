@@ -55,7 +55,6 @@ void Context::on_disconnect(asion::connection_ptr conn)
 void Context::shutdown(void)
 {
   peers.shutdown();
-  std::cerr << "The server is shutting down." << std::endl;
 }
 
 asion::next Context::on_read(
