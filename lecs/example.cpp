@@ -39,15 +39,8 @@ int main(int argc, char *argv[])
       }
     };
 
-    using namespace std::placeholders;
-    auto context = std::make_shared<asion::Context>(
-      std::bind(&lecs::Context::on_connect, &handlers, _1),
-      std::bind(&lecs::Context::on_disconnect, &handlers, _1),
-      std::bind(&lecs::Context::shutdown, &handlers),
-      std::bind(&lecs::Context::on_read, &handlers, _1, _2, _3),
-      std::bind(&lecs::Context::on_write, &handlers, _1)
-    );
-    // Initialise the server.
+    auto context = handlers.node_context();
+
     asion::Node s(context, argv[1], argv[2]);
 
     // Run the server until stopped.
