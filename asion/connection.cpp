@@ -40,7 +40,12 @@ void connection::start()
 
 void connection::stop()
 {
-  socket_.close();
+  // Initiate graceful connection closure.
+  asio::error_code ignored_ec;
+  socket_.shutdown(
+    asio::ip::tcp::socket::shutdown_both,
+    ignored_ec
+  );
 }
 
 const connection::endpoint_address &connection::endpoint_local()
