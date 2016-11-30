@@ -55,19 +55,15 @@ public:
 
   void onconn(asion::connection_ptr c)
   {
-//    conn = c;
     cursor = messages_flat.begin();
     message_idx = 0;
   }
 
   void ondisc(asion::connection_ptr c)
-  {
-//    ASSERT_EQ(conn, c) << "Connection mismatch";
-  }
+  {}
 
   void intake(asion::connection_ptr c, ::lecs::Message &&received)
   {
-//    ASSERT_EQ(conn, c) << "Connection mismatch";
     ASSERT_NE(cursor, messages_flat.end()) << "Received message is unexpected: " << received;
     ASSERT_EQ(*cursor, received) << "Received message differs from the expected, idx " << message_idx;
     ++cursor;
@@ -76,36 +72,35 @@ public:
 
   void finished()
   {
-//    ASSERT_EQ(cursor, messages_flat.end()) << "Did not receive all expected messages";
+    ASSERT_EQ(cursor, messages_flat.end()) << "Did not receive all expected messages";
   }
 
 protected:
   message_vec::value_type::const_iterator cursor{messages_flat.begin()};
   uint message_idx{0};
 
-//  asion::connection_ptr conn;
 };
 
 struct Nodes: public ::testing::Test
 {
-  TestContext server_context, client_context, cliser_context;
+  TestContext server_context, client_context, cl_ser_context;
 
   asion::Node
     server{server_context.node_context(), "0.0.0.0", "50001"},
-    client{server_context.node_context()},
-    cliser{server_context.node_context(), "0.0.0.0", "50002"};
+    client{client_context.node_context()},
+    cl_ser{cl_ser_context.node_context(), "0.0.0.0", "50002"};
 
   std::thread
     server_thread,
     client_thread,
-    cliser_thread;
+    cl_ser_thread;
 
 protected:
   virtual void SetUp()
   {
     server_thread = std::thread(std::bind(&asion::Node::run, &server));
     client_thread = std::thread(std::bind(&asion::Node::run, &client));
-    cliser_thread = std::thread(std::bind(&asion::Node::run, &cliser));
+    cl_ser_thread = std::thread(std::bind(&asion::Node::run, &cl_ser));
   }
 
   virtual void TearDown()
@@ -116,16 +111,16 @@ protected:
     client.shutdown();
     client_thread.join();
 
-    cliser.shutdown();
-    cliser_thread.join();
+    cl_ser.shutdown();
+    cl_ser_thread.join();
   }
 
 };
 
 TEST_F(Nodes, connect)
 {
-  client.connect({"localhost", "50002"});
-  cliser.connect({"localhost", "50001"});
+//  client.connect({"localhost", "50002"});
+  cl_ser.connect({"localhost", "50001"});
 }
 
 TEST(Flatten, strings)
