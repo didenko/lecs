@@ -43,15 +43,20 @@ const message_vec messages{
 
 const message_vec::value_type messages_flat{flatten(messages)};
 
-class TestContext: public ::lecs::Context
+class TestContext
 {
 public:
-  TestContext() : ::lecs::Context(
+  TestContext() : ctx(
     std::bind(&TestContext::onconn, this, _1),
     std::bind(&TestContext::ondisc, this, _1),
     std::bind(&TestContext::intake, this, _1, _2)
   )
   {}
+
+  asion::context_ptr node_context()
+  {
+    return ctx.node_context();
+  }
 
   void onconn(asion::connection_ptr c)
   {
@@ -76,6 +81,7 @@ public:
   }
 
 protected:
+  ::lecs::Context ctx;
   message_vec::value_type::const_iterator cursor{messages_flat.begin()};
   uint message_idx{0};
 
