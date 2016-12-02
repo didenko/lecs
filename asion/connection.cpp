@@ -80,19 +80,8 @@ void connection::do_read()
     [this, self](std::error_code ec, std::size_t bytes_transferred) {
       if (!ec)
       {
-        switch (context->on_read(self, buffer_, bytes_transferred))
-        {
-          case next::read:
-            do_read();
-            break;
-          case next::write:
-            do_write();
-            break;
-          case next::disconnect:
-            context->on_disconnect(self);
-            raise(SIGTERM);
-            break;
-        };
+        context->on_read(self, buffer_, bytes_transferred);
+        do_read();
       }
       else if (ec != asio::error::operation_aborted)
       {

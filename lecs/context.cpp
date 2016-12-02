@@ -57,7 +57,7 @@ void Context::shutdown(void)
   peers.shutdown();
 }
 
-asion::next Context::on_read(
+void Context::on_read(
   asion::connection_ptr conn,
   const asion::buffer &buf,
   std::size_t sz
@@ -71,8 +71,6 @@ asion::next Context::on_read(
 
   while (get_line(raw_message, cursor, last))
     intake(conn, std::move(raw_message));
-
-  return asion::next::read;
 }
 
 std::vector<asio::const_buffer> Context::on_write(asion::connection_ptr)

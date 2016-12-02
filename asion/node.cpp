@@ -87,12 +87,9 @@ asio::error_code Node::connect(const asio::ip::tcp::resolver::query &remote)
     [this, socket_ptr](std::error_code ecc, asio::ip::tcp::resolver::iterator) {
       if (!ecc)
       {
-        context->on_connect(
-          std::make_shared<connection>(
-            std::move(*socket_ptr),
-            context
-          )
-        );
+        auto conn = std::make_shared<connection>(std::move(*socket_ptr), context);
+        conn->start();
+        context->on_connect(conn);
       }
     }
   );
@@ -115,12 +112,9 @@ void Node::do_accept()
 
       if (!ec)
       {
-        context->on_connect(
-          std::make_shared<connection>(
-            std::move(socket_),
-            context
-          )
-        );
+        auto conn = std::make_shared<connection>(std::move(socket_), context);
+        conn->start();
+        context->on_connect(conn);
       }
 
       do_accept();

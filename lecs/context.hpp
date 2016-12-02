@@ -42,7 +42,7 @@ public:
 
   void shutdown(void);
 
-  asion::next on_read(asion::connection_ptr, const asion::buffer &, std::size_t);
+  void on_read(asion::connection_ptr, const asion::buffer &, std::size_t);
 
   std::vector<asio::const_buffer> on_write(asion::connection_ptr);
 
