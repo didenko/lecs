@@ -87,9 +87,10 @@ asio::error_code Node::connect(const asio::ip::tcp::resolver::query &remote)
     [this, socket_ptr](std::error_code ecc, asio::ip::tcp::resolver::iterator) {
       if (!ecc)
       {
-        auto conn = std::make_shared<connection>(std::move(*socket_ptr), context);
-        conn->start();
-        context->on_connect(conn);
+        context->on_connect(std::make_shared<connection>(
+          std::move(*socket_ptr),
+          context
+        ));
       }
     }
   );
@@ -105,16 +106,14 @@ void Node::do_accept()
     socket_,
     [this](std::error_code ec) {
 
-      // Check whether the server was stopped by a signal before this
-      // completion handler had a chance to run.
-
       if (!acceptor_.is_open()) return;
 
       if (!ec)
       {
-        auto conn = std::make_shared<connection>(std::move(socket_), context);
-        conn->start();
-        context->on_connect(conn);
+        context->on_connect(std::make_shared<connection>(
+          std::move(socket_),
+          context
+        ));
       }
 
       do_accept();
