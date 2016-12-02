@@ -106,10 +106,4 @@ void connection::do_write(const std::vector<asio::const_buffer> &buffers)
   );
 }
 
-void connection::do_write()
-{
-  auto self(shared_from_this());
-  do_write(context->on_write(self));
-}
-
 }

@@ -56,8 +56,6 @@ public:
   const endpoint_address &endpoint_remote();
 
   /// Perform an asynchronous write operation.
-  void do_write();
-
   void do_write(const std::vector<asio::const_buffer> &);
 
 private:
