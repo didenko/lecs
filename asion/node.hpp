@@ -13,6 +13,7 @@
 
 #include <asio.hpp>
 #include <string>
+#include <thread>
 #include "connection.hpp"
 #include "context.hpp"
 
@@ -33,6 +34,8 @@ public:
     const std::string &address = "",
     const std::string &port = ""
   );
+
+  ~Node();
 
   /// Run the server's io_service loop.
   void run();
@@ -55,22 +58,21 @@ private:
   void do_await_stop();
 
   /// The io_service used to perform asynchronous operations.
-  asio::io_service io_service_;
+  asio::io_service io_service_{};
 
-  asio::ip::tcp::resolver resolver_;
+  asio::ip::tcp::resolver resolver_{io_service_};
 
   /// The signal_set is used to register for process termination notifications.
-  asio::signal_set signals_;
+  asio::signal_set signals_{io_service_};
 
   /// Acceptor used to listen for incoming connections.
-  asio::ip::tcp::acceptor acceptor_;
-
-  /// The next socket to be accepted
-  asio::ip::tcp::socket socket_;
+  asio::ip::tcp::acceptor acceptor_{io_service_};
 
   /// The handler for all incoming requests.
 //  request_handler request_handler_;
   context_ptr context;
+
+  std::thread runner;
 };
 
 }

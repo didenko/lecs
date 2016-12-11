@@ -22,12 +22,8 @@ Node::Node(
   const std::string &address,
   const std::string &port
 ) :
-  io_service_(),
-  signals_(io_service_),
-  acceptor_(io_service_),
-  socket_(io_service_),
-  resolver_(io_service_),
-  context(context)
+  context(context),
+  runner(std::bind(&Node::run, this))
 {
   // Register to handle the signals that indicate when the server should exit.
   // It is safe to register for the same signal multiple times in a program,
@@ -42,6 +38,12 @@ Node::Node(
   do_await_stop();
 
   if (address != "") start_accept(address, port);
+}
+
+Node::~Node()
+{
+  shutdown();
+  if (runner.joinable()) runner.join();
 }
 
 void Node::start_accept(const std::string &address, const std::string &port)
@@ -84,7 +86,7 @@ asio::error_code Node::connect(const asio::ip::tcp::resolver::query &remote)
   asio::async_connect(
     *socket_ptr,
     endpoints,
-    [this, socket_ptr](std::error_code ecc, asio::ip::tcp::resolver::iterator) {
+    [this, socket_ptr](const std::error_code &ecc, asio::ip::tcp::resolver::iterator i) {
       if (!ecc)
       {
         context->on_connect(std::make_shared<connection>(
@@ -102,16 +104,18 @@ asio::error_code Node::connect(const asio::ip::tcp::resolver::query &remote)
 
 void Node::do_accept()
 {
-  acceptor_.async_accept(
-    socket_,
-    [this](std::error_code ec) {
 
+  auto socket_ptr = std::make_shared<asio::ip::tcp::socket>(io_service_);
+
+  acceptor_.async_accept(
+    *socket_ptr,
+    [this, socket_ptr](const std::error_code &ec) {
       if (!acceptor_.is_open()) return;
 
       if (!ec)
       {
         context->on_connect(std::make_shared<connection>(
-          std::move(socket_),
+          std::move(*socket_ptr),
           context
         ));
       }
@@ -126,8 +130,8 @@ void Node::shutdown()
   // operations. Once all operations have finished the io_service::run()
   // call will exit.
   acceptor_.close();
-  io_service_.stop(); // TODO: This should not have to be done - but the thread hangs without it.
   context->on_shutdown();
+  io_service_.stop(); // TODO: This should not have to be done - but the thread hangs without it.
 }
 
 void Node::do_await_stop()

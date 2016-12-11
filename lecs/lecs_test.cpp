@@ -12,6 +12,7 @@
 #include <cstring>
 #include <vector>
 #include <thread>
+#include <condition_variable>
 
 #include <gtest/gtest.h>
 #include "context.hpp"
@@ -62,6 +63,8 @@ public:
   {
     cursor = messages_flat.begin();
     message_idx = 0;
+    connected_flag.notify_one();
+    conn = c;
   }
 
   void ondisc(asion::connection_ptr c)
@@ -80,53 +83,47 @@ public:
     ASSERT_EQ(cursor, messages_flat.end()) << "Did not receive all expected messages";
   }
 
+  void disconnect()
+  {
+    conn->stop();
+    conn.reset();
+  }
+
+  std::condition_variable connected_flag, finished_flag;
+  uint message_idx{10};
 protected:
   ::lecs::Context ctx;
+  asion::connection_ptr conn;
   message_vec::value_type::const_iterator cursor{messages_flat.begin()};
-  uint message_idx{0};
-
 };
 
 struct Nodes: public ::testing::Test
 {
-  TestContext server_context, client_context, cl_ser_context;
+};
+
+TEST_F(Nodes, connect_with_retry)
+{
+  std::mutex connected_flag_mutex, finished_flag_mutex;
+
+  TestContext
+    server_context,
+    client_context;
 
   asion::Node
     server{server_context.node_context(), "0.0.0.0", "50001"},
-    client{client_context.node_context()},
-    cl_ser{cl_ser_context.node_context(), "0.0.0.0", "50002"};
+    client{client_context.node_context()};
 
-  std::thread
-    server_thread,
-    client_thread,
-    cl_ser_thread;
-
-protected:
-  virtual void SetUp()
+  client.connect({"localhost", "50001"});
   {
-    server_thread = std::thread(std::bind(&asion::Node::run, &server));
-    client_thread = std::thread(std::bind(&asion::Node::run, &client));
-    cl_ser_thread = std::thread(std::bind(&asion::Node::run, &cl_ser));
+    std::unique_lock<std::mutex> connection_flag_lock(connected_flag_mutex);
+    ASSERT_TRUE(client_context.connected_flag.wait_for(
+      connection_flag_lock,
+      std::chrono::seconds(600),
+      [&client_context]() { return client_context.message_idx == 0; }
+    )) << "Connection from client to server timed out";
   }
 
-  virtual void TearDown()
-  {
-    server.shutdown();
-    server_thread.join();
-
-    client.shutdown();
-    client_thread.join();
-
-    cl_ser.shutdown();
-    cl_ser_thread.join();
-  }
-
-};
-
-TEST_F(Nodes, connect)
-{
-//  client.connect({"localhost", "50002"});
-  cl_ser.connect({"localhost", "50001"});
+  client_context.disconnect();
 }
 
 TEST(Flatten, strings)

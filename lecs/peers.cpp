@@ -9,6 +9,9 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
+#include <thread>
+#include <chrono>
+
 #include "peers.hpp"
 
 namespace lecs {
@@ -41,10 +44,10 @@ void Peers::del(asion::connection_ptr c)
 
 void Peers::shutdown()
 {
-  for (auto c: conns)
-    c->stop();
-
   std::lock_guard<std::shared_timed_mutex> lock(peers_lock);
+
+//  std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  for (auto c: conns) c->stop();
   conns.clear();
 }
 

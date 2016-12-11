@@ -1,5 +1,5 @@
 set(
-    ASIOS_SOURCE_FILES
+    ASION_SOURCE_FILES
 
     connection.cpp
     context.cpp
@@ -7,9 +7,22 @@ set(
 )
 
 add_library(
-    asios
+    asion
     STATIC
-    ${ASIOS_SOURCE_FILES}
+    ${ASION_SOURCE_FILES}
 )
 
-add_dependencies(asios asio)
+add_dependencies(asion asio)
+
+add_executable(
+    asion_tests
+    asion_test.cpp
+)
+target_link_libraries(asion_tests ${GTEST_LIBS} asion)
+
+enable_testing()
+
+add_test(
+    NAME asion_tests
+    COMMAND asion_tests
+)
