@@ -9,7 +9,6 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include <signal.h>
 #include <utility>
 #include <iostream>
 
@@ -23,19 +22,16 @@ Node::Node(
   const std::string &port
 ) :
   context(context),
-  runner(std::bind(&Node::run, this))
+  resolver_{io_service_},
+  acceptor_{io_service_}
 {
-  // Register to handle the signals that indicate when the server should exit.
-  // It is safe to register for the same signal multiple times in a program,
-  // provided all registration for the specified signal is made through Asio.
-  signals_.add(SIGINT);
-  signals_.add(SIGTERM);
-
-  #if defined(SIGQUIT)
-  signals_.add(SIGQUIT);
-  #endif // defined(SIGQUIT)
-
-  do_await_stop();
+  runner = std::thread(
+    std::bind(
+      &Node::run,
+      this,
+      [](const std::string &s) { std::cerr << s << std::endl; }
+    )
+  );
 
   if (address != "") start_accept(address, port);
 }
@@ -50,29 +46,51 @@ void Node::start_accept(const std::string &address, const std::string &port)
 {
   // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
   asio::error_code ec;
-  auto endpoints = resolver_.resolve({address, port}, ec);
-  if (ec)
+  try
   {
-    std::cerr << "Failed to resolve the listen address: " << ec.message() << std::endl;
-    raise(SIGTERM);
-  };
+    auto endpoints = resolver_.resolve({address, port}, ec);
+    if (ec)
+    {
+      std::cerr << "Failed to resolve the listen address: " << ec.message() << std::endl;
+      std::exit(1);
+    };
 
-  asio::ip::tcp::endpoint endpoint{*endpoints};
-  acceptor_.open(endpoint.protocol());
-  acceptor_.set_option(asio::ip::tcp::acceptor::reuse_address(true));
-  acceptor_.bind(endpoint);
+    asio::ip::tcp::endpoint endpoint{*endpoints};
+    acceptor_.open(endpoint.protocol());
+    acceptor_.set_option(asio::ip::tcp::acceptor::reuse_address(true));
+    acceptor_.bind(endpoint);
+  }
+  catch (std::exception &e)
+  {
+    std::cerr << e.what() << std::endl;
+    std::exit(1);
+  }
+
   acceptor_.listen();
 
   do_accept();
 }
 
-void Node::run()
+void Node::run(std::function<void(const std::string &)> exception_handler)
 {
   // The io_service::run() call will block until all asynchronous operations
   // have finished. While the server is running, there is always at least one
   // asynchronous operation outstanding: the asynchronous accept call waiting
   // for new incoming clients.
-  io_service_.run();
+
+  asio::io_service::work work(io_service_);
+  for (;;)
+  {
+    try
+    {
+      io_service_.run();
+      break;
+    }
+    catch (std::exception &e)
+    {
+      exception_handler(e.what());
+    }
+  };
 }
 
 asio::error_code Node::connect(const asio::ip::tcp::resolver::query &remote)
@@ -81,18 +99,15 @@ asio::error_code Node::connect(const asio::ip::tcp::resolver::query &remote)
   auto endpoints = resolver_.resolve(remote, ec);
   if (ec) return ec;
 
-  auto socket_ptr = std::make_shared<asio::ip::tcp::socket>(io_service_);
+  auto conn = connection(io_service_, context).ptr();
 
   asio::async_connect(
-    *socket_ptr,
+    conn->socket(),
     endpoints,
-    [this, socket_ptr](const std::error_code &ecc, asio::ip::tcp::resolver::iterator i) {
+    [this, conn](const std::error_code &ecc, asio::ip::tcp::resolver::iterator i) {
       if (!ecc)
       {
-        context->on_connect(std::make_shared<connection>(
-          std::move(*socket_ptr),
-          context
-        ));
+        context->on_connect(conn);
       }
     }
   );
@@ -105,19 +120,16 @@ asio::error_code Node::connect(const asio::ip::tcp::resolver::query &remote)
 void Node::do_accept()
 {
 
-  auto socket_ptr = std::make_shared<asio::ip::tcp::socket>(io_service_);
+  auto conn = std::make_shared<connection>(io_service_, context);
 
   acceptor_.async_accept(
-    *socket_ptr,
-    [this, socket_ptr](const std::error_code &ec) {
+    conn->socket(),
+    [this, conn](const std::error_code &ec) {
       if (!acceptor_.is_open()) return;
 
       if (!ec)
       {
-        context->on_connect(std::make_shared<connection>(
-          std::move(*socket_ptr),
-          context
-        ));
+        context->on_connect(conn);
       }
 
       do_accept();
@@ -126,20 +138,10 @@ void Node::do_accept()
 
 void Node::shutdown()
 {
-  // The server is stopped by cancelling all outstanding asynchronous
-  // operations. Once all operations have finished the io_service::run()
-  // call will exit.
-  acceptor_.close();
   context->on_shutdown();
+  acceptor_.close();
   io_service_.stop(); // TODO: This should not have to be done - but the thread hangs without it.
-}
-
-void Node::do_await_stop()
-{
-  signals_.async_wait(
-    [this](std::error_code /*ec*/, int /*signo*/) {
-      shutdown();
-    });
+//  std::this_thread::sleep_for(std::chrono::microseconds(100));
 }
 
 }

@@ -10,7 +10,6 @@
 //
 
 #include <iostream>
-#include <signal.h>
 
 #include "connection.hpp"
 
@@ -23,14 +22,19 @@ connection::endpoint_address::operator std::string() const
 }
 
 connection::connection(
-  asio::ip::tcp::socket socket,
+  asio::io_service &ios,
   context_ptr context
-)
-  : socket_(std::move(socket)),
+) :
+  socket_{ios},
   context(context)
 {
   endpoint_local();
   endpoint_remote();
+}
+
+connection_ptr connection::ptr()
+{
+  return shared_from_this();
 }
 
 void connection::start()
@@ -40,12 +44,16 @@ void connection::start()
 
 void connection::stop()
 {
-  // Initiate graceful connection closure.
-  asio::error_code ignored_ec;
-  socket_.shutdown(
-    asio::ip::tcp::socket::shutdown_both,
-    ignored_ec
-  );
+  if (socket_.is_open())
+  {
+    asio::error_code ignored_ec;
+    socket_.close(ignored_ec);
+  }
+}
+
+asio::ip::tcp::socket &connection::socket()
+{
+  return socket_;
 }
 
 const connection::endpoint_address &connection::endpoint_local()
@@ -87,6 +95,9 @@ void connection::do_read()
       {
         context->on_disconnect(self);
       }
+      else
+      { ;
+      };
     });
 }
 

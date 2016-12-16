@@ -19,7 +19,6 @@
 
 namespace asion {
 
-/// The top-level class of the server.
 class Node
 {
 public:
@@ -27,8 +26,6 @@ public:
 
   Node &operator=(const Node &) = delete;
 
-  /// Construct the server to listen on the specified TCP address and port, and
-  /// serve up files from the given directory.
   explicit Node(
     context_ptr context,
     const std::string &address = "",
@@ -37,42 +34,22 @@ public:
 
   ~Node();
 
-  /// Run the server's io_service loop.
-  void run();
+  void run(std::function<void(const std::string &)>);
 
-  /// Shutdown the server.
   void shutdown();
 
-  /// Extablish a connection.
   asio::error_code connect(const asio::ip::tcp::resolver::query &remote);
 
 private:
 
-  /// Resolve listening address and start the acceptor loop
   void start_accept(const std::string &address, const std::string &port);
 
-  /// Perform an asynchronous accept operation.
   void do_accept();
 
-  /// Wait for a request to stop the server.
-  void do_await_stop();
-
-  /// The io_service used to perform asynchronous operations.
-  asio::io_service io_service_{};
-
-  asio::ip::tcp::resolver resolver_{io_service_};
-
-  /// The signal_set is used to register for process termination notifications.
-  asio::signal_set signals_{io_service_};
-
-  /// Acceptor used to listen for incoming connections.
-  asio::ip::tcp::acceptor acceptor_{io_service_};
-
-  /// The handler for all incoming requests.
-//  request_handler request_handler_;
   context_ptr context;
-
+  asio::io_service io_service_{};
+  asio::ip::tcp::acceptor acceptor_;
+  asio::ip::tcp::resolver resolver_;
   std::thread runner;
 };
-
 }

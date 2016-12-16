@@ -18,8 +18,6 @@
 
 namespace asion {
 
-class connection_manager;
-
 /// Represents a single connection from a client.
 class connection
   : public std::enable_shared_from_this<connection>
@@ -37,9 +35,11 @@ public:
 
   /// Construct a connection with the given socket.
   explicit connection(
-    asio::ip::tcp::socket socket,
+    asio::io_service &ios,
     context_ptr context
   );
+
+  connection_ptr ptr();
 
   connection(const connection &) = delete;
 
@@ -50,6 +50,8 @@ public:
 
   /// Stop all asynchronous operations associated with the connection.
   void stop();
+
+  asio::ip::tcp::socket &socket();
 
   const endpoint_address &endpoint_local();
 
