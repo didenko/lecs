@@ -99,7 +99,7 @@ asio::error_code Node::connect(const asio::ip::tcp::resolver::query &remote)
   auto endpoints = resolver_.resolve(remote, ec);
   if (ec) return ec;
 
-  auto conn = connection(io_service_, context).ptr();
+  auto conn = std::make_shared<connection>(io_service_, context);
 
   asio::async_connect(
     conn->socket(),
@@ -138,6 +138,8 @@ void Node::do_accept()
 
 void Node::shutdown()
 {
+//  asio::io_service::work work(io_service_);
+
   context->on_shutdown();
   acceptor_.close();
   io_service_.stop(); // TODO: This should not have to be done - but the thread hangs without it.

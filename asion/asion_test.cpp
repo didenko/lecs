@@ -57,7 +57,7 @@ public:
 
   void dcon()
   {
-    conn->stop();
+    if (conn) conn->stop();
   }
 
 protected:
@@ -73,10 +73,10 @@ public:
 
 struct AsionNodes: public ::testing::Test
 {
-  constexpr static uint numruns{2000};
+  constexpr static uint numruns{50000};
   std::string host{"localhost"};
   std::string port{"50001"};
-  std::chrono::seconds timeout{10};
+  std::chrono::seconds timeout{5};
 };
 
 TEST_F(AsionNodes, connect_proper_seq)
@@ -96,7 +96,7 @@ TEST_F(AsionNodes, connect_proper_seq)
 
     {
       std::unique_lock<std::mutex> connection_flag_lock(client_ctx.connected_flag_mutex);
-      ASSERT_TRUE(client_ctx.connected_flag.wait_for(
+      EXPECT_TRUE(client_ctx.connected_flag.wait_for(
         connection_flag_lock,
         timeout,
         [&client_ctx]() {
@@ -133,7 +133,7 @@ TEST_F(AsionNodes, connect_svr_shut_first)
 {
   for (uint i = 0; i < numruns; ++i)
   {
-    std::cerr << "it: " << i << std::endl;
+//    std::cerr << "it: " << i << std::endl;
 
     AsionTestContext
       server_ctx{"server"},
@@ -148,7 +148,7 @@ TEST_F(AsionNodes, connect_svr_shut_first)
 
     {
       std::unique_lock<std::mutex> connection_flag_lock(client_ctx.connected_flag_mutex);
-      ASSERT_TRUE(client_ctx.connected_flag.wait_for(
+      EXPECT_TRUE(client_ctx.connected_flag.wait_for(
         connection_flag_lock,
         timeout,
         [&client_ctx]() {
