@@ -63,9 +63,9 @@ public:
 protected:
   const std::string &tag;
   ::asion::context_ptr ctx;
-  ::asion::connection_ptr conn;
 
 public:
+  ::asion::connection_ptr conn;
   std::condition_variable connected_flag;
   std::mutex connected_flag_mutex;
   bool connected_confirmation{false};
@@ -73,41 +73,11 @@ public:
 
 struct AsionNodes: public ::testing::Test
 {
-  constexpr static uint numruns{50000};
+  constexpr static uint numruns{10000};
   std::string host{"localhost"};
   std::string port{"50001"};
   std::chrono::seconds timeout{5};
 };
-
-TEST_F(AsionNodes, connect_proper_seq)
-{
-  for (uint i = 0; i < numruns; ++i)
-  {
-    AsionTestContext
-      server_ctx{"server"},
-      client_ctx{"client"};
-
-    ::asion::Node
-      server{server_ctx.node_context(), host, port},
-      client{client_ctx.node_context()};
-
-    auto ec = client.connect({host, port});
-    ASSERT_FALSE(ec) << ec.message();
-
-    {
-      std::unique_lock<std::mutex> connection_flag_lock(client_ctx.connected_flag_mutex);
-      EXPECT_TRUE(client_ctx.connected_flag.wait_for(
-        connection_flag_lock,
-        timeout,
-        [&client_ctx]() {
-          auto old = client_ctx.connected_confirmation;
-          client_ctx.connected_confirmation = false;
-          return old;
-        }
-      )) << "Connection from client to server timed out on iteration " << i;
-    }
-  }
-}
 
 TEST_F(AsionNodes, connect_no_wait)
 {
@@ -123,18 +93,43 @@ TEST_F(AsionNodes, connect_no_wait)
 
     auto ec = client.connect({host, port});
     ASSERT_FALSE(ec) << ec.message();
-
-    client.shutdown();
-    server.shutdown();
   }
 }
 
-TEST_F(AsionNodes, connect_svr_shut_first)
+TEST_F(AsionNodes, connect_destruct)
 {
   for (uint i = 0; i < numruns; ++i)
   {
-//    std::cerr << "it: " << i << std::endl;
+    AsionTestContext
+      server_ctx{"server"},
+      client_ctx{"client"};
 
+    ::asion::Node
+      server{server_ctx.node_context(), host, port},
+      client{client_ctx.node_context()};
+
+    auto ec = client.connect({host, port});
+    ASSERT_FALSE(ec) << ec.message();
+
+    {
+      std::unique_lock<std::mutex> connection_flag_lock(client_ctx.connected_flag_mutex);
+      EXPECT_TRUE(client_ctx.connected_flag.wait_for(
+        connection_flag_lock,
+        timeout,
+        [&client_ctx]() {
+          auto old = client_ctx.connected_confirmation;
+          client_ctx.connected_confirmation = false;
+          return old;
+        }
+      )) << "Connection from client to server timed out on iteration " << i;
+    }
+  }
+}
+
+TEST_F(AsionNodes, connect_disconnect)
+{
+  for (uint i = 0; i < numruns; ++i)
+  {
     AsionTestContext
       server_ctx{"server"},
       client_ctx{"client"};
@@ -159,8 +154,19 @@ TEST_F(AsionNodes, connect_svr_shut_first)
       )) << "Connection from client to server timed out on iteration " << i;
     }
 
-    client.shutdown();
-    server.shutdown();
+    client_ctx.conn.reset();
+    {
+      std::unique_lock<std::mutex> connection_flag_lock(client_ctx.connected_flag_mutex);
+      EXPECT_TRUE(client_ctx.connected_flag.wait_for(
+        connection_flag_lock,
+        timeout,
+        [&client_ctx]() {
+          auto old = client_ctx.connected_confirmation;
+          client_ctx.connected_confirmation = true;
+          return !old;
+        }
+      )) << "Disconnection to server timed out on iteration " << i;
+    }
   }
 }
 

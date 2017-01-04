@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     asion::Node s(context, argv[1], argv[2]);
 
     // Run the server until stopped.
-    s.run();
+//    s.run();
   }
   catch (std::exception &e)
   {
