@@ -16,12 +16,14 @@ Context::Context(
   connected c,
   disconnected d,
   shutdown s,
+  admitter a,
   reader r,
   writer w
 ) :
   on_connect(c),
   on_disconnect(d),
   on_shutdown(s),
+  admit_read(a),
   on_read(r),
   on_write(w)
 {};

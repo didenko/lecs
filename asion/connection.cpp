@@ -34,7 +34,7 @@ connection::connection(
 
 connection_ptr connection::ptr()
 {
-  return shared_from_this();
+  return this->shared_from_this();
 }
 
 void connection::start()
@@ -83,12 +83,12 @@ const connection::endpoint_address &connection::endpoint_remote()
 void connection::do_read()
 {
   auto self(shared_from_this());
-  socket_.async_read_some(
-    asio::buffer(buffer_),
+  context->admit_read(
+    self,
     [this, self](std::error_code ec, std::size_t bytes_transferred) {
       if (!ec)
       {
-        context->on_read(self, buffer_, bytes_transferred);
+        context->on_read(self, bytes_transferred);
         do_read();
       }
       else if (ec != asio::error::operation_aborted)
@@ -96,9 +96,11 @@ void connection::do_read()
         context->on_disconnect(self);
       }
       else
-      { ;
+      {
+        throw std::runtime_error(ec.message());
       };
-    });
+    }
+  );
 }
 
 void connection::do_write(const std::vector<asio::const_buffer> &buffers)

@@ -73,8 +73,6 @@ private:
   /// The context with nesessary handlers.
   context_ptr context;
 
-  /// Buffer for incoming data.
-  buffer buffer_;
 };
 
 }

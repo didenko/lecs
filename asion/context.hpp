@@ -14,8 +14,6 @@
 
 namespace asion {
 
-using buffer = std::array<char, 8192>;
-
 class connection;
 
 using connection_ptr = std::shared_ptr<connection>;
@@ -23,7 +21,9 @@ using connection_ptr = std::shared_ptr<connection>;
 using connected = std::function<void(connection_ptr)>;
 using disconnected = std::function<void(connection_ptr)>;
 using shutdown = std::function<void(void)>;
-using reader = std::function<void(connection_ptr, const buffer &, std::size_t)>;
+
+using admitter = std::function<void(connection_ptr, std::function<void(std::error_code, std::size_t)>)>;
+using reader = std::function<void(connection_ptr, std::size_t)>;
 using writer = std::function<std::vector<asio::const_buffer>(connection_ptr)>;
 
 struct Context
@@ -33,6 +33,8 @@ public:
     connected c,
     disconnected d,
     shutdown s,
+
+    admitter a,
     reader r,
     writer w
   );
@@ -40,6 +42,8 @@ public:
   const connected on_connect;
   const disconnected on_disconnect;
   const shutdown on_shutdown;
+
+  const admitter admit_read;
   const reader on_read;
   const writer on_write;
 };
