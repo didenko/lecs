@@ -9,7 +9,6 @@
 //
 
 #include <iostream>
-#include <cstring>
 #include <vector>
 #include <thread>
 #include <condition_variable>

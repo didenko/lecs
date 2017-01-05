@@ -21,7 +21,7 @@ using Message = std::string;
 using Cursor = asion::buffer::const_iterator;
 using OnConnect = std::function<void(asion::connection_ptr)>;
 using OnDisconnect = std::function<void(asion::connection_ptr)>;
-using Intake= std::function<void(asion::connection_ptr, Message && )>;
+using Intake= std::function<void(asion::connection_ptr, Message &&)>;
 
 class Context
 {

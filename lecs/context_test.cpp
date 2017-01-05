@@ -9,7 +9,6 @@
 //
 
 #include <iostream>
-#include <cstring>
 
 #include <gtest/gtest.h>
 #include "context.hpp"

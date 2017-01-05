@@ -9,7 +9,6 @@
 //
 
 #include <iostream>
-#include <cstring>
 #include <vector>
 #include <thread>
 #include <condition_variable>
@@ -35,7 +34,7 @@ public:
       [](::asion::connection_ptr c) {},
       std::bind(&AsionTestContext::dcon, this),
 
-      [](::asion::connection_ptr c, std::function<void(std::error_code, std::size_t)> h){},
+      [](::asion::connection_ptr c, std::function<void(std::error_code, std::size_t)> h) {},
       [](::asion::connection_ptr c, std::size_t s) {},
       [](::asion::connection_ptr) { return std::vector<asio::const_buffer>(); }
     ))
