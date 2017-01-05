@@ -105,15 +105,15 @@ void connection::do_read()
 
 void connection::do_write(const std::vector<asio::const_buffer> &buffers)
 {
-  auto self(shared_from_this());
+  auto self(this->shared_from_this());
   asio::async_write(
     socket_,
     buffers,
     [this, self](std::error_code ec, std::size_t) {
       if (ec)
       {
-        std::cerr << "post-write to " << std::string(remote) << ": " << ec.message() << std::endl;
-        context->on_disconnect(shared_from_this());
+        std::cerr << "post-write to " << std::string{remote} << ": " << ec.message() << std::endl;
+        context->on_disconnect(self);
       }
     }
   );
