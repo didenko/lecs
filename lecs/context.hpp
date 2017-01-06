@@ -10,15 +10,15 @@
 
 #pragma once
 
+#include <functional>
 #include "asion/node.hpp"
 #include "peers.hpp"
 
 namespace lecs {
 
-constexpr asion::buffer::value_type eol{'\n'};
+constexpr auto eol = '\n';
 
 using Message = std::string;
-using Cursor = asion::buffer::const_iterator;
 using OnConnect = std::function<void(asion::connection_ptr)>;
 using OnDisconnect = std::function<void(asion::connection_ptr)>;
 using Intake= std::function<void(asion::connection_ptr, Message &&)>;
@@ -42,7 +42,9 @@ public:
 
   void shutdown(void);
 
-  void on_read(asion::connection_ptr, const asion::buffer &, std::size_t);
+  void admit_read(asion::connection_ptr, std::function<void(std::error_code, std::size_t)>);
+
+  void on_read(asion::connection_ptr, std::size_t);
 
   std::vector<asio::const_buffer> on_write(asion::connection_ptr);
 
@@ -54,10 +56,10 @@ private:
   const Intake intake;
   Peers peers;
 
+  std::shared_ptr<asion::Context> basic_context;
+
 protected:
   std::string endpoint(asion::connection_ptr, bool remote = true);
-
-  static bool get_line(Message &msg, Cursor &first, const Cursor &last);
 };
 
 }

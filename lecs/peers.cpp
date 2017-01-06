@@ -27,7 +27,7 @@ void Peers::add(asion::connection_ptr c)
 {
   {
     std::lock_guard<std::shared_timed_mutex> lock(peers_lock);
-    conns.insert(c);
+    conns.emplace(c, std::make_shared<buffer>());
   }
   c->start();
 }
@@ -41,12 +41,17 @@ void Peers::del(asion::connection_ptr c)
   c->stop();
 }
 
+buffer_ptr Peers::at(asion::connection_ptr conn)
+{
+  std::lock_guard<std::shared_timed_mutex> lock(peers_lock);
+  return conns.at(conn);
+}
+
 void Peers::shutdown()
 {
   std::lock_guard<std::shared_timed_mutex> lock(peers_lock);
 
-//  std::this_thread::sleep_for(std::chrono::milliseconds(1));
-  for (auto c: conns) c->stop();
+  for (auto& conn_buf: conns) conn_buf.first->stop();
   conns.clear();
 }
 

@@ -3,7 +3,7 @@ set(
     context.cpp
     context.cpp
     peers.cpp
-    context_test.cpp)
+)
 
 add_library(
     lecs
@@ -18,7 +18,6 @@ target_link_libraries(lecs_node lecs asion)
 
 add_executable(
     lecs_tests
-    context_test.cpp
     lecs_test.cpp
 )
 target_link_libraries(lecs_tests ${GTEST_LIBS} lecs asion)

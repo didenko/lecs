@@ -25,18 +25,21 @@ Context::Context(OnConnect c, OnDisconnect d, Intake i) :
   on_conn(c),
   on_disc(d),
   intake(i)
-{}
-
-asion::context_ptr Context::node_context()
 {
   using namespace std::placeholders;
-  return std::make_shared<asion::Context>(
+  basic_context = std::make_shared<asion::Context>(
     std::bind(&::lecs::Context::on_connect, this, _1),
     std::bind(&::lecs::Context::on_disconnect, this, _1),
     std::bind(&::lecs::Context::shutdown, this),
-    std::bind(&::lecs::Context::on_read, this, _1, _2, _3),
+    std::bind(&::lecs::Context::admit_read, this, _1, _2),
+    std::bind(&::lecs::Context::on_read, this, _1, _2),
     std::bind(&::lecs::Context::on_write, this, _1)
   );
+}
+
+asion::context_ptr Context::node_context()
+{
+  return basic_context;
 }
 
 void Context::on_connect(asion::connection_ptr conn)
@@ -57,20 +60,25 @@ void Context::shutdown(void)
   peers.shutdown();
 }
 
+void Context::admit_read(asion::connection_ptr conn, std::function<void(std::error_code, std::size_t)> handler)
+{
+  asio::async_read_until(
+    conn->socket(),
+    *(peers.at(conn)),
+    eol,
+    handler
+  );
+}
+
 void Context::on_read(
   asion::connection_ptr conn,
-  const asion::buffer &buf,
   std::size_t sz
 )
 {
-  Cursor
-    cursor{buf.begin()},
-    last{cursor + sz - 1};
-
+  std::istream in_stream(peers.at(conn).get());
   Message raw_message;
-
-  while (get_line(raw_message, cursor, last))
-    intake(conn, std::move(raw_message));
+  std::getline(in_stream, raw_message);
+  intake(conn, std::move(raw_message));
 }
 
 std::vector<asio::const_buffer> Context::on_write(asion::connection_ptr)
@@ -85,20 +93,6 @@ void Context::write(asion::connection_ptr conn, const std::string &messages)
   std::vector<asio::const_buffer> buffers;
   buffers.push_back(asio::buffer(messages));
   conn->do_write(buffers);
-}
-
-bool Context::get_line(Message &msg, Cursor &current, const Cursor &last)
-{
-  if (current == last) return false;
-
-  Cursor first{current};
-
-  while (current != last && *current != eol) ++current;
-
-  msg.assign(first, current);
-
-  if (current != last) ++current;
-  return true;
 }
 
 std::string Context::endpoint(asion::connection_ptr conn, bool remote)

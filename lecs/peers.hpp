@@ -11,11 +11,14 @@
 
 #pragma once
 
-#include <set>
+#include <unordered_map>
 #include <shared_mutex>
 #include "asion/connection.hpp"
 
 namespace lecs {
+
+using buffer = asio::streambuf;
+using buffer_ptr =  std::shared_ptr<buffer>;
 
 class Peers
 {
@@ -32,10 +35,12 @@ public:
 
   void del(asion::connection_ptr);
 
+  buffer_ptr at(asion::connection_ptr);
+
   void shutdown();
 
 private:
-  std::set<asion::connection_ptr> conns;
+  std::unordered_map<asion::connection_ptr, buffer_ptr> conns;
   std::shared_timed_mutex peers_lock;
 };
 

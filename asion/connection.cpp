@@ -97,7 +97,7 @@ void connection::do_read()
       }
       else
       {
-        throw std::runtime_error(ec.message());
+        throw std::runtime_error("do_read: " + ec.message());
       };
     }
   );
