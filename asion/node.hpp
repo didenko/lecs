@@ -36,6 +36,8 @@ public:
 
   void run(std::function<void(const std::string &)>);
 
+  void wait();
+
   void shutdown();
 
   asio::error_code connect(const asio::ip::tcp::resolver::query &remote);

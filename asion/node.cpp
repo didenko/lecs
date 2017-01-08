@@ -39,7 +39,7 @@ Node::Node(
 Node::~Node()
 {
   shutdown();
-  if (runner.joinable()) runner.join();
+  wait();
 }
 
 void Node::start_accept(const std::string &address, const std::string &port)
@@ -91,6 +91,11 @@ void Node::run(std::function<void(const std::string &)> exception_handler)
       exception_handler(e.what());
     }
   };
+}
+
+void Node::wait()
+{
+  if (runner.joinable()) runner.join();
 }
 
 asio::error_code Node::connect(const asio::ip::tcp::resolver::query &remote)
