@@ -69,6 +69,19 @@ public:
   void ondisc(asion::connection_ptr c)
   {}
 
+  void replay()
+  {
+    for (auto &msg: messages)
+    {
+      std::string str;
+      for (auto &part: msg)
+      {
+        str += part + ::lecs::eol;
+      }
+      ctx.write(conn, str);
+    }
+  }
+
   void intake(asion::connection_ptr c, ::lecs::Message &&received)
   {
     ASSERT_NE(cursor, messages_flat.end()) << "Received message is unexpected: " << received;
@@ -98,6 +111,9 @@ protected:
 
 struct Nodes: public ::testing::Test
 {
+  std::string
+    host{"127.0.0.1"},
+    port{"50001"};
 };
 
 TEST_F(Nodes, connect_with_retry)
@@ -109,10 +125,10 @@ TEST_F(Nodes, connect_with_retry)
     client_context;
 
   asion::Node
-    server{server_context.node_context(), "0.0.0.0", "50001"},
+    server{server_context.node_context(), host, port},
     client{client_context.node_context()};
 
-  client.connect({"localhost", "50001"});
+  client.connect({host, port});
   {
     std::unique_lock<std::mutex> connection_flag_lock(connected_flag_mutex);
     ASSERT_TRUE(client_context.connected_flag.wait_for(
@@ -121,6 +137,8 @@ TEST_F(Nodes, connect_with_retry)
       [&client_context]() { return client_context.message_idx == 0; }
     )) << "Connection from client to server timed out";
   }
+
+  client_context.replay();
 
   client_context.disconnect();
 }
