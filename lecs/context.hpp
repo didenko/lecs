@@ -20,7 +20,7 @@ constexpr auto eol = '\n';
 
 using Message = std::string;
 using OnConnect = std::function<void(asion::connection_ptr)>;
-using OnDisconnect = std::function<void(asion::connection_ptr)>;
+using OnDisconnect = std::function<void(asion::connection_ptr, const std::string &)>;
 using Intake= std::function<void(asion::connection_ptr, Message &&)>;
 
 class Context
@@ -38,7 +38,7 @@ public:
 
   void on_connect(asion::connection_ptr);
 
-  void on_disconnect(asion::connection_ptr);
+  void on_disconnect(asion::connection_ptr, const std::string &);
 
   void shutdown(void);
 

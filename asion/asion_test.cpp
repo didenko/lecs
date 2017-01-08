@@ -31,7 +31,7 @@ public:
     tag(std::move(tag)),
     ctx(std::make_shared<::asion::Context>(
       std::bind(&AsionTestContext::onconn, this, _1),
-      [](::asion::connection_ptr c) {},
+      [](::asion::connection_ptr c, const std::string &) {},
       std::bind(&AsionTestContext::dcon, this),
 
       [](::asion::connection_ptr c, std::function<void(std::error_code, std::size_t)> h) {},

@@ -30,8 +30,8 @@ int main(int argc, char *argv[])
       [](asion::connection_ptr conn) {
         std::cerr << "Connection from: " << std::string(conn->endpoint_remote()) << std::endl;
       },
-      [](asion::connection_ptr conn) {
-        std::cerr << "Disconnected from: " << std::string(conn->endpoint_remote()) << std::endl;
+      [](asion::connection_ptr conn, const std::string & diag) {
+        std::cerr << "Disconnected from: " << std::string(conn->endpoint_remote()) << ", reason: " << diag << std::endl;
       },
       [&handlers](asion::connection_ptr conn, lecs::Message m) {
         handlers.write(conn, m + "\n");

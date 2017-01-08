@@ -19,7 +19,7 @@ class connection;
 using connection_ptr = std::shared_ptr<connection>;
 
 using connected = std::function<void(connection_ptr)>;
-using disconnected = std::function<void(connection_ptr)>;
+using disconnected = std::function<void(connection_ptr, const std::string &)>;
 using shutdown = std::function<void(void)>;
 
 using admitter = std::function<void(connection_ptr, std::function<void(std::error_code, std::size_t)>)>;

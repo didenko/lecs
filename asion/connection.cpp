@@ -91,14 +91,10 @@ void connection::do_read()
         context->on_read(self, bytes_transferred);
         do_read();
       }
-      else if (ec != asio::error::operation_aborted)
-      {
-        context->on_disconnect(self);
-      }
       else
       {
-        throw std::runtime_error("do_read: " + ec.message());
-      };
+        context->on_disconnect(self, ec.message());
+      }
     }
   );
 }
@@ -112,8 +108,11 @@ void connection::do_write(const std::vector<asio::const_buffer> &buffers)
     [this, self](std::error_code ec, std::size_t) {
       if (ec)
       {
-        std::cerr << "post-write to " << std::string{remote} << ": " << ec.message() << std::endl;
-        context->on_disconnect(self);
+        context->on_disconnect(
+          self,
+          "error after writing to " +
+            std::string{remote} +
+            ": " + ec.message());
       }
     }
   );

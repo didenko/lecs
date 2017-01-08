@@ -16,7 +16,7 @@ namespace lecs {
 Context::Context()
   : Context(
   [](asion::connection_ptr) {},
-  [](asion::connection_ptr) {},
+  [](asion::connection_ptr, const std::string &) {},
   [](asion::connection_ptr, lecs::Message m) {}
 )
 {}
@@ -29,7 +29,7 @@ Context::Context(OnConnect c, OnDisconnect d, Intake i) :
   using namespace std::placeholders;
   basic_context = std::make_shared<asion::Context>(
     std::bind(&::lecs::Context::on_connect, this, _1),
-    std::bind(&::lecs::Context::on_disconnect, this, _1),
+    std::bind(&::lecs::Context::on_disconnect, this, _1, _2),
     std::bind(&::lecs::Context::shutdown, this),
     std::bind(&::lecs::Context::admit_read, this, _1, _2),
     std::bind(&::lecs::Context::on_read, this, _1, _2),
@@ -48,9 +48,9 @@ void Context::on_connect(asion::connection_ptr conn)
   on_conn(conn);
 }
 
-void Context::on_disconnect(asion::connection_ptr conn)
+void Context::on_disconnect(asion::connection_ptr conn, const std::string & diag = "")
 {
-  on_disc(conn);
+  on_disc(conn, diag);
   conn->stop();
   peers.del(conn);
 }
