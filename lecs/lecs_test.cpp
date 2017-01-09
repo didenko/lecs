@@ -43,12 +43,19 @@ public:
     std::bind(&TestContext::intake, this, _1, _2)
   )
   {
-    messages = message_vec({
-      {""},
-      {"", ""},
-      {"abc", "1234567890", "ABCDEFGHIJ"},
-      {"", "XYZ", ""}
-    });
+    messages = message_vec(
+      {
+        {""},
+        {"", ""},
+        {"abc", "1234567890", "ABCDEFGHIJ"},
+        {"", "XYZ", ""}
+      }
+    );
+
+    std::string long_msg;
+    for (uint i = 0; i < 500; ++i) long_msg += "0123456789ABCDEF";
+    messages.emplace_back(message_vec::value_type{long_msg});
+
     messages_flat = flatten(messages);
     cursor = messages_flat.begin();
   }
@@ -79,10 +86,7 @@ public:
     for (auto &msg: messages)
     {
       std::string str;
-      for (auto &part: msg)
-      {
-        str += part + ::lecs::eol;
-      }
+      for (auto &part: msg) str += part + ::lecs::eol;
       write(conn, str);
     }
   }
