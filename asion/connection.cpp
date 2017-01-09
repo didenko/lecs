@@ -56,7 +56,7 @@ asio::ip::tcp::socket &connection::socket()
   return socket_;
 }
 
-const connection::endpoint_address &connection::endpoint_local()
+const connection::endpoint_address &connection::endpoint_local() const
 {
   if (!local.err) return local;
   auto ep = socket_.local_endpoint(local.err);
@@ -68,7 +68,7 @@ const connection::endpoint_address &connection::endpoint_local()
   return local;
 };
 
-const connection::endpoint_address &connection::endpoint_remote()
+const connection::endpoint_address &connection::endpoint_remote() const
 {
   if (!remote.err) return remote;
   auto ep = socket_.remote_endpoint(remote.err);

@@ -1,3 +1,3 @@
-`asion` namespace is a factored-out portion of _asio_'s `c11/http/server` example. Unlike the `httpl` namespace this is the code which gathers the example's underlying network communication behaviours.
+`asion` namespace is a factored-out portion of _asio_'s `c11/http/server` example. This is the code which gathers the example's underlying network communication behaviours and excludes any `http` specifics.
 
 The goal was to extract code which which may be more universal than the http server example. This refactoring also is an experiment in creating a generic enough interface to such connectivity code which is simpler than the full asio access.

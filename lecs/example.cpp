@@ -2,7 +2,6 @@
 // example.cpp
 // ~~~~~~~~
 //
-// Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2016 Vlad Didenko (business at didenko dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,7 +27,7 @@ int main(int argc, char *argv[])
 
     lecs::Context handlers{
       [](asion::connection_ptr conn) {
-        std::cerr << "Connection from: " << std::string(conn->endpoint_remote()) << std::endl;
+        std::cerr << "Connection from: " << std::string{conn->endpoint_remote()} << std::endl;
       },
       [](asion::connection_ptr conn, const std::string & diag) {
         std::cerr << "Disconnected from: " << std::string(conn->endpoint_remote()) << ", reason: " << diag << std::endl;

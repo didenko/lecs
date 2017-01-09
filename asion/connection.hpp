@@ -53,9 +53,9 @@ public:
 
   asio::ip::tcp::socket &socket();
 
-  const endpoint_address &endpoint_local();
+  const endpoint_address &endpoint_local() const;
 
-  const endpoint_address &endpoint_remote();
+  const endpoint_address &endpoint_remote() const;
 
   /// Perform an asynchronous write operation.
   void do_write(const std::vector<asio::const_buffer> &);
@@ -68,7 +68,7 @@ private:
   asio::ip::tcp::socket socket_;
 
   /// Cached connection addresses
-  endpoint_address local, remote;
+  mutable endpoint_address local, remote;
 
   /// The context with nesessary handlers.
   context_ptr context;
