@@ -69,6 +69,11 @@ public:
   void ondisc(asion::connection_ptr c)
   {}
 
+  void write(asion::connection_ptr c, const std::string &str)
+  {
+    ctx.write(c, str);
+  }
+
   void replay()
   {
     for (auto &msg: messages)
@@ -78,7 +83,7 @@ public:
       {
         str += part + ::lecs::eol;
       }
-      ctx.write(conn, str);
+      write(conn, str);
     }
   }
 
