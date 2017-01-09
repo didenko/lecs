@@ -34,15 +34,6 @@ const typename outer_type::value_type flatten(const outer_type &outer)
 
 using message_vec = std::vector<std::vector<std::string>>;
 
-const message_vec messages{
-  {""},
-  {"", ""},
-  {"abc", "1234567890", "ABCDEFGHIJ"},
-  {"", "XYZ", ""}
-};
-
-const message_vec::value_type messages_flat{flatten(messages)};
-
 class TestContext
 {
 public:
@@ -51,7 +42,16 @@ public:
     std::bind(&TestContext::ondisc, this, _1),
     std::bind(&TestContext::intake, this, _1, _2)
   )
-  {}
+  {
+    messages = message_vec({
+      {""},
+      {"", ""},
+      {"abc", "1234567890", "ABCDEFGHIJ"},
+      {"", "XYZ", ""}
+    });
+    messages_flat = flatten(messages);
+    cursor = messages_flat.begin();
+  }
 
   asion::context_ptr node_context()
   {
@@ -111,7 +111,10 @@ public:
 protected:
   ::lecs::Context ctx;
   asion::connection_ptr conn;
-  message_vec::value_type::const_iterator cursor{messages_flat.begin()};
+
+  message_vec messages;
+  message_vec::value_type messages_flat;
+  message_vec::value_type::const_iterator cursor;
 };
 
 struct Nodes: public ::testing::Test
