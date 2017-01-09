@@ -116,7 +116,7 @@ struct Nodes: public ::testing::Test
     port{"50001"};
 };
 
-TEST_F(Nodes, connect_with_retry)
+TEST_F(Nodes, connect_with_replay)
 {
   std::mutex connected_flag_mutex, finished_flag_mutex;
 
