@@ -133,7 +133,7 @@ TEST_F(Nodes, connect_with_retry)
     std::unique_lock<std::mutex> connection_flag_lock(connected_flag_mutex);
     ASSERT_TRUE(client_context.connected_flag.wait_for(
       connection_flag_lock,
-      std::chrono::seconds(600),
+      std::chrono::seconds(1),
       [&client_context]() { return client_context.message_idx == 0; }
     )) << "Connection from client to server timed out";
   }
